@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>입회신청서</title>
+  </head>
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      font-family: "Noto Sans KR", sans-serif;
+      background-color: #f0f0f0;
+      color: #333;
+    }
+
+    .container {
+      margin-top: 50px;
+      border-radius: 20px;
+      width: 1200px;
+      box-sizing: border-box;
+    }
+
+    /* 탭 스타일 */
+    .tabs {
+      font-size: 13px;
+      line-height: 20px;
+    }
+
+    .tabs ul:before,
+    .tabs ul:after {
+      content: "\0020";
+      display: block;
+      height: 0;
+      visibility: hidden;
+    }
+
+    .tabs ul:after {
+      clear: both;
+    }
+
+    .tabs ul {
+      margin: 0;
+      list-style: none;
+      padding: 0 6%;
+      zoom: 1;
+    }
+
+    .tabs ul li {
+      position: relative;
+      float: left;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .tabs ul li a {
+      background: #f6f6f6;
+      font-weight: bold;
+      text-align: center;
+      display: block;
+      border: 1px solid #e0e0e0;
+      color: #909090;
+      padding: 6px 18px;
+      margin: 0 5px -1px 0;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      text-decoration: none;
+    }
+
+    .tabs ul li a:hover {
+      border-color: rgb(214, 241, 207);
+      color: #606060;
+    }
+
+    .tabs ul li.active a {
+      background: #fff;
+      border-color: #d4d4d4;
+      color: #dd390d;
+      margin-top: -4px;
+      padding-top: 10px;
+    }
+
+    /* 탭 콘텐츠 스타일 */
+    .tab-content {
+      display: none;
+      padding: 50px 100px;
+    }
+
+    .tab-content.active {
+      display: block;
+      width: 1200px;
+      background-color: #ffffff;
+      border-radius: 20px;
+    }
+
+    .tab_head {
+      margin-bottom: 50px;
+    }
+
+    .form {
+        display: flex;
+        justify-content: space-evenly;
+    }
+  </style>
+
+  <body>
+    <section class="container">
+      <div class="tabs">
+        <ul>
+          <li class="active" data-tab="tab1"><a href="#">회원 입회 신청</a></li>
+          <li data-tab="tab2"><a href="#">기간별 입회신청 내역조회 </a></li>
+          <li data-tab="tab3"><a href="#">소지 카드 내역조회</a></li>
+          <li data-tab="tab4"><a href="#">카드 상세 내역조회</a></li>
+          <li data-tab="tab5"><a href="#">회원 색인 조회</a></li>
+        </ul>
+      </div>
+
+      <div class="tab-content active" id="tab1">
+        <h1 class="tab_head">회원 입회 신청</h1>
+          <form>
+            <label for="name">주민번호</label>
+            <input type="text" id="name" name="name" required />
+            <br />
+            <label for="email">접수일자</label>
+            <input type="email" id="email" name="email" required />
+            <br />
+            <label for="phone">접수 일련 번호</label>
+            <input type="tel" id="phone" name="phone" required />
+            <br />
+            <button type="submit">조회</button>
+      </div>
+
+      <div class="tab-content" id="tab2">
+        <h1 class="tab_head">기간별 입회신청 내역조회</h1>
+        <p>과학 관련 내용이 여기에 표시됩니다.</p>
+      </div>
+      <div class="tab-content" id="tab3">
+        <h1 class="tab_head">소지 카드 내역조회</h1>
+        <p>비지니스 관련 내용이 여기에 표시됩니다.</p>
+      </div>
+      <div class="tab-content" id="tab4">
+        <h1 class="tab_head">카드 상세 내역조회</h1>
+        <p>테크 관련 내용이 여기에 표시됩니다.</p>
+      </div>
+      <div class="tab-content" id="tab5">
+        <h1 class="tab_head">회원 색인 조회</h1>
+        <p>디자인 관련 내용이 여기에 표시됩니다.</p>
+      </div>
+    </section>
+
+    <script>
+      const tabs = document.querySelectorAll(".tabs ul li");
+      const contents = document.querySelectorAll(".tab-content");
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          // 탭 활성화 처리
+          tabs.forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+
+          // 콘텐츠 표시 처리
+          contents.forEach((c) => c.classList.remove("active"));
+          const target = document.getElementById(tab.dataset.tab);
+          target.classList.add("active");
+        });
+      });
+    </script>
+  </body>
+</html>

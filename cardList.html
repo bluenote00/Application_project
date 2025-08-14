@@ -42,10 +42,10 @@
     }
     .form-grid input:focus, .form-grid select:focus { outline: none; border-color: #454e55; }
 
-    .form-grid.single-line-full { display: grid; grid-template-columns: repeat(2, 1fr) 120px; gap: 15px 20px; align-items: end; }
+    .form-grid.single-line-full { display: grid; grid-template-columns: repeat(3, 1fr) 120px; gap: 15px 20px; align-items: end; }
     .form-grid.single-line-full .button-cell button { width: 100%; }
 
-    .form-grid.single-line-post { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px 20px; }
+     .form-grid.single-line-post { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px 20px; }
     .post-code-wrapper input { width: 65%; padding: 10px; border-radius: 8px; border: 1px solid #a8b2b9; }
     .post-code-wrapper button { width: 30%; padding: 8px; }
 
@@ -91,15 +91,19 @@
     <div class="tab-content active" id="tab-periodical">
       <h1>소지 카드 내역조회</h1>
 
-      <!-- 검색 조건 -->
+    <!-- 검색 조건 -->
       <div class="form-grid single-line-full">
-        <div>
+       <div>
           <label for="jumin">생년월일</label>
           <input type="text" id="birth" name="birth" />
         </div>
         <div>
-          <label for="jumin">카드번호</label>
+         <label for="jumin">카드번호</label>
           <input type="text" id="jumin" name="jumin" />
+        </div>
+        <div>
+           <label for="접수번호">접수 일련 번호</label>
+          <input type="text" id="접수번호" name="접수번호" />
         </div>
         <div class="button-cell">
           <label>&nbsp;</label>

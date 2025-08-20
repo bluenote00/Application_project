@@ -1,3 +1,5 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -204,6 +206,12 @@
         .double-input input {
             width: 50%;
         }
+
+        input[readonly] {
+            background-color: #f5f5f5;
+            color: #666;
+            border: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
@@ -221,21 +229,27 @@
 
     <!-- 콘텐츠 -->
     <div class="tab-content active" id="tab-periodical">
-        <h1>회원 색인 조회</h1>
+        <h1>기간별 입회 신청 내역 조회</h1>
 
         <!-- 검색 조건 -->
         <div class="form-grid single-line-full">
-            <div>
-                <label for="name">성명</label>
-                <input type="text" id="name" name="name"/>
+            <div class="double-input">
+                <label>기간</label>
+                <div>
+                    <input type="date" name="startDate"/>
+                    <input type="date" name="endDate"/>
+                </div>
             </div>
             <div>
-                <label for="jumin">생년월일</label>
+                <label for="신청구분">신청구분</label>
+                <select id="신청구분" name="신청구분">
+                    <option>구분1</option>
+                    <option>구분2</option>
+                </select>
+            </div>
+            <div>
+                <label for="jumin">주민번호</label>
                 <input type="text" id="jumin" name="jumin"/>
-            </div>
-            <div>
-                <label for="phone">핸드폰번호</label>
-                <input type="text" id="phone" name="phone"/>
             </div>
             <div class="button-cell">
                 <label>&nbsp;</label>
@@ -251,13 +265,16 @@
             <thead>
             <tr>
                 <th>번호</th>
+                <th>접수일자</th>
+                <th>접수 일련번호</th>
                 <th>주민번호</th>
                 <th>성명(한글)</th>
-                <th>생년월일</th>
-                <th>핸드폰 번호</th>
-                <th>결제 은행</th>
-                <th>결제 계좌</th>
-                <th>주소</th>
+                <th>성명(영문)</th>
+                <th>신청구분</th>
+                <th>브랜드</th>
+                <th>핸드폰번호</th>
+                <th>불능구분</th>
+                <th>불능 사유명</th>
             </tr>
             </thead>
             <tbody>

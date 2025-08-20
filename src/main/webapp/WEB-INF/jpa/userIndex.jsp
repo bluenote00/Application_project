@@ -1,3 +1,5 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -204,12 +206,6 @@
         .double-input input {
             width: 50%;
         }
-
-        input[readonly] {
-            background-color: #f5f5f5;
-            color: #666;
-            border: 1px solid #ccc;
-        }
     </style>
 </head>
 <body>
@@ -227,21 +223,21 @@
 
     <!-- 콘텐츠 -->
     <div class="tab-content active" id="tab-periodical">
-        <h1>상세 카드 내역조회</h1>
+        <h1>회원 색인 조회</h1>
 
         <!-- 검색 조건 -->
         <div class="form-grid single-line-full">
             <div>
-                <label for="jumin">생년월일</label>
-                <input type="text" id="birth" name="birth"/>
+                <label for="name">성명</label>
+                <input type="text" id="name" name="name"/>
             </div>
             <div>
-                <label for="jumin">카드번호</label>
+                <label for="jumin">생년월일</label>
                 <input type="text" id="jumin" name="jumin"/>
             </div>
             <div>
-                <label for="접수번호">접수 일련 번호</label>
-                <input type="text" id="접수번호" name="접수번호"/>
+                <label for="phone">핸드폰번호</label>
+                <input type="text" id="phone" name="phone"/>
             </div>
             <div class="button-cell">
                 <label>&nbsp;</label>
@@ -253,88 +249,17 @@
 
         <!-- 조회 결과 -->
         <h4>조회 결과</h4>
-        <div class="form-grid">
-            <div>
-                <label for="성명_한글">성명(한글)</label>
-                <input type="text" id="성명_한글" name="성명_한글" readonly/>
-            </div>
-            <div>
-                <label for="성명_영문">성명(영문)</label>
-                <input type="text" id="성명_영문" name="성명_영문" readonly/>
-            </div>
-        </div>
-
-
-        <div class="form-grid">
-            <div>
-                <label for="등록일자">등록일자</label>
-                <input type="text" id="등록일자" name="등록일자" readonly/>
-            </div>
-            <div>
-                <label for="유효기간">유효기간</label>
-                <input type="text" id="유효기간" name="유효기간" readonly/>
-            </div>
-        </div>
-
-        <div class="form-grid">
-            <div>
-                <label for="브랜드">브랜드</label>
-                <input type="text" id="브랜드" name="브랜드" readonly/>
-            </div>
-            <div>
-                <label for="카드등급">카드등급</label>
-                <input type="text" id="카드등급" name="카드등급" readonly/>
-            </div>
-        </div>
-
-        <div class="form-grid">
-            <div>
-                <label for="전_카드번호">전 카드번호</label>
-                <input type="text" id="전_카드번호" name="전_카드번호" readonly/>
-            </div>
-            <div>
-                <label for="고객번호">고객번호</label>
-                <input type="text" id="고객번호" name="고객번호" readonly/>
-            </div>
-        </div>
-
-        <div class="form-grid">
-            <div>
-                <label for="영업점">관리 영업점</label>
-                <input type="text" id="영업점" name="영업점" readonly/>
-            </div>
-            <div>
-                <label for="최종카드">최종 카드여부</label>
-                <input type="text" id="최종카드" name="최종카드" readonly/>
-            </div>
-        </div>
-
-        <div class="form-grid">
-            <div>
-                <label for="최종_등록일자">최종 등록일자</label>
-                <input type="text" id="최종_등록일자" name="최종_등록일자" readonly/>
-            </div>
-        </div>
-
-        <hr/>
-
         <table>
             <thead>
             <tr>
                 <th>번호</th>
-                <th>접수일자</th>
-                <th>접수일련번호</th>
+                <th>주민번호</th>
                 <th>성명(한글)</th>
-                <th>성명(영문)</th>
-                <th>등록일자</th>
-                <th>유효기간</th>
-                <th>브랜드</th>
-                <th>카드등급</th>
-                <th>전 카드번호</th>
-                <th>고객번호</th>
-                <th>관리 영업점</th>
-                <th>최종 카드여부</th>
-                <th>최종 등록일자</th>
+                <th>생년월일</th>
+                <th>핸드폰 번호</th>
+                <th>결제 은행</th>
+                <th>결제 계좌</th>
+                <th>주소</th>
             </tr>
             </thead>
             <tbody>
@@ -343,7 +268,6 @@
         </table>
 
         <hr/>
-
         <div class="button-row">
             <button type="reset">초기화</button>
         </div>

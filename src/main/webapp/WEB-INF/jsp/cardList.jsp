@@ -219,11 +219,11 @@
     <!-- 탭 메뉴 -->
     <div class="tabs">
         <ul>
-            <li><a href="/index.html">회원 입회 신청</a></li>
-            <li><a href="/periodicalList.html">기간별 입회신청 내역조회</a></li>
-            <li><a href="/cardList.html">소지 카드 내역조회</a></li>
-            <li><a href="/cardDetailList.html">카드 상세 내역조회</a></li>
-            <li><a href="/userIndex.html">회원 색인 조회</a></li>
+            <li data-tab="tab1"><a href="${pageContext.request.contextPath}/application/index">회원 입회 신청</a></li>
+            <li data-tab="tab2"><a href="${pageContext.request.contextPath}/application/periodicalList">기간별 입회신청 내역조회</a></li>
+            <li class="active" data-tab="tab3"><a href="${pageContext.request.contextPath}/application/cardList">소지 카드 내역조회</a></li>
+            <li data-tab="tab4"><a href="${pageContext.request.contextPath}/application/cardDetailList">카드 상세 내역조회</a></li>
+            <li data-tab="tab5"><a href="${pageContext.request.contextPath}/application/userIndex">회원 색인 조회</a></li>
         </ul>
     </div>
 

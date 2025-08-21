@@ -215,11 +215,11 @@
 <section class="container">
     <div class="tabs">
         <ul>
-            <li class="active" data-tab="tab1"><a href="/index.html">회원 입회 신청</a></li>
-            <li data-tab="tab2"><a href="/periodicalList.html">기간별 입회신청 내역조회</a></li>
-            <li data-tab="tab3"><a href="/cardList.html">소지 카드 내역조회</a></li>
-            <li data-tab="tab4"><a href="/cardDetailList.html">카드 상세 내역조회</a></li>
-            <li data-tab="tab5"><a href="/userIndex.html">회원 색인 조회</a></li>
+            <li class="active" data-tab="tab1"><a href="${pageContext.request.contextPath}/application/index">회원 입회 신청</a></li>
+            <li data-tab="tab2"><a href="${pageContext.request.contextPath}/application/periodicalList">기간별 입회신청 내역조회</a></li>
+            <li data-tab="tab3"><a href="${pageContext.request.contextPath}/application/cardList">소지 카드 내역조회</a></li>
+            <li data-tab="tab4"><a href="${pageContext.request.contextPath}/application/cardDetailList">카드 상세 내역조회</a></li>
+            <li data-tab="tab5"><a href="${pageContext.request.contextPath}/application/userIndex">회원 색인 조회</a></li>
         </ul>
     </div>
 
@@ -227,45 +227,50 @@
         <h1>회원 입회 신청</h1>
 
         <!-- 주민번호, 접수일자, 접수번호, 조회 -->
+        <form>
         <div class="form-grid single-line-full">
             <div>
                 <label for="jumin">주민번호</label>
-                <input type="text" id="jumin" name="jumin"/>
+                <input type="text" id="ssn" name="ssn" />
             </div>
             <div>
                 <label for="접수일자">접수일자</label>
-                <input type="date" id="접수일자" name="접수일자"/>
+                <input type="date" id="rcvD" name="rcvD" />
             </div>
             <div>
                 <label for="접수번호">접수 일련 번호</label>
-                <input type="text" id="접수번호" name="접수번호"/>
+                <input type="text" id="rcvSeqNo" name="rcvSeqNo" />
             </div>
             <div class="button-cell">
                 <label>&nbsp;</label>
                 <button type="submit">조회</button>
             </div>
         </div>
-
+        </form>
         <hr/>
 
         <!-- 신청 정보 -->
         <div class="form-grid">
             <div>
                 <label for="신청일자">신청일자</label>
-                <input type="date" id="신청일자" name="신청일자"/>
+                <input type="date" id="applD" name="applD"/>
             </div>
             <div>
                 <label for="신청구분">신청구분</label>
-                <select id="신청구분" name="신청구분">
-                    <option>구분1</option>
-                    <option>구분2</option>
+                <select id="applClas" name="applClas">
+                    <option value="">선택</option>
+                    <option value="11">최초신규</option>
+                    <option value="12">추가신규</option>
+                    <option value="21">추가재발급</option>
                 </select>
             </div>
             <div>
                 <label for="브랜드">브랜드</label>
-                <select id="브랜드" name="브랜드">
-                    <option>브랜드1</option>
-                    <option>브랜드2</option>
+                <select id="brd" name="brd">
+                    <option value="">선택</option>
+                    <option value="1">MASTER</option>
+                    <option value="2">VISA</option>
+                    <option value="3">JCB</option>
                 </select>
             </div>
         </div>
@@ -274,15 +279,15 @@
         <div class="form-grid">
             <div>
                 <label for="성명_한글">성명(한글)</label>
-                <input type="text" id="성명_한글" name="성명_한글"/>
+                <input type="text" id="hgNm" name="hgNm" />
             </div>
             <div>
                 <label for="성명_영어">성명(영어)</label>
-                <input type="text" id="성명_영어" name="성명_영어"/>
+                <input type="text" id="engNm" name="engNm" />
             </div>
             <div>
                 <label for="생년월일">생년월일</label>
-                <input type="date" id="생년월일" name="생년월일"/>
+                <input type="date" id="birthD" name="birthD"/>
             </div>
         </div>
 
@@ -290,20 +295,32 @@
         <div class="form-grid">
             <div>
                 <label for="결제일자">결제일자</label>
-                <input type="date" id="결제일자" name="결제일자"/>
+                <input type="date" id="stlDD" name="stlDD"/>
             </div>
             <div>
-                <label for="결제방법">결제방법</label>
-                <select id="결제방법" name="결제방법">
-                    <option>카드</option>
-                    <option>현금</option>
+                <label for="결제방법">결제 방법</label>
+                <select id="stlMtd" name="stlMtd">
+                    <option value="1">지로</option>
+                    <option value="2">자동이체</option>
+                    <option value="3">CMS</option>
                 </select>
             </div>
             <div>
                 <label for="결제은행">결제은행</label>
-                <select id="결제은행" name="결제은행">
-                    <option>은행1</option>
-                    <option>은행2</option>
+                <select id="bnkCd" name="bnkCd">
+                    <option value="002">산업은행</option>
+                    <option value="003">기업은행</option>
+                    <option value="004"국민은행</option>
+                    <option value="005">외환은행</option>
+                    <option value="007">수협중앙회</option>
+                    <option value="011">농협중앙회</option>
+                    <option value="012">농협단위조합</option>
+                    <option value="016">축협중앙회</option>
+                    <option value="017">축협단위조합</option>
+                    <option value="020">우리은행</option>
+                    <option value="023">제일은행</option>
+                    <option value="026">신한은행</option>
+                    <option value="027">시티은행</option>
                 </select>
             </div>
         </div>
@@ -312,17 +329,18 @@
         <div class="form-grid">
             <div>
                 <label for="결제계좌">결제계좌</label>
-                <input type="text" id="결제계좌" name="결제계좌"/>
+                <input type="text" id="stlAct" name="stlAct" />
             </div>
             <div>
                 <label for="결제계좌">결제계좌 확인 여부</label>
-                <input type="text" id="결제계좌" name="결제계좌" readonly/>
+                <input type="text" id="stlActCheck" name="stlActCheck" readonly/>
             </div>
             <div>
                 <label for="청구서 발송 방법">청구서 발송 방법</label>
-                <select id="청구서 발송 방법" name="청구서 발송 방법">
-                    <option>우편</option>
-                    <option>CMS</option>
+                <select id="stmtSndMtd" name="stmtSndMtd">
+                    <option value="1">우편</option>
+                    <option value="2">E-MAIL</option>
+                    <option value="3">청구서 사절</option>
                 </select>
             </div>
         </div>
@@ -332,17 +350,17 @@
             <div>
                 <div class="post-code-wrapper">
                     <label for="우편번호">우편번호</label>
-                    <input type="text" id="우편번호" name="우편번호" placeholder="우편번호"/>
+                    <input type="text" id="billadrZip" name="billadrZip" placeholder="우편번호"/>
                     <button type="button" onclick="PostCode()">우편번호 찾기</button>
                 </div>
             </div>
             <div>
                 <label for="주소">주소</label>
-                <input type="text" id="주소" name="주소"/>
+                <input type="text" id="billadrAdr1" name="billadrAdr1"/>
             </div>
             <div>
                 <label for="상세주소">상세 주소</label>
-                <input type="text" id="상세주소" name="상세주소"/>
+                <input type="text" id="billadrAdr2" name="billadrAdr2"/>
             </div>
         </div>
 
@@ -350,15 +368,15 @@
         <div class="form-grid">
             <div>
                 <label for="이메일">이메일</label>
-                <input type="email" id="이메일" name="이메일"/>
+                <input type="email" id="emailAdr" name="emailAdr"/>
             </div>
             <div>
                 <label for="핸드폰">핸드폰 번호</label>
-                <input type="tel" id="핸드폰" name="핸드폰"/>
+                <input type="tel" id="hdpNo" name="hdpNo"/>
             </div>
             <div>
                 <label for="비밀번호">비밀번호</label>
-                <input type="password" id="비밀번호" name="비밀번호"/>
+                <input type="password" id="scrtNo" name="scrtNo"/>
             </div>
         </div>
 
@@ -366,11 +384,11 @@
         <div class="form-grid">
             <div>
                 <label for="불능구분">불능 구분</label>
-                <input type="text" id="불능구분" name="불능구분" readonly/>
+                <input type="text" id="impsbClas" name="impsbClas" readonly/>
             </div>
             <div>
                 <label for="불능사유명">불능 사유명</label>
-                <input type="text" id="불능사유명" name="불능사유명" readonly/>
+                <input type="text" id="impsbCd" name="impsbCd" readonly/>
             </div>
         </div>
 
@@ -402,9 +420,9 @@
         new daum.Postcode({
             oncomplete: function (data) {
 
-                document.getElementById('우편번호').value = data.zonecode; // 우편번호
-                document.getElementById('주소').value = data.address; // 주소
-                document.getElementById('상세주소').focus(); // 상세주소에 커서
+                document.getElementById('billadrZip').value = data.zonecode;
+                document.getElementById('billadrAdr1').value = data.address;
+                document.getElementById('billadrAdr2').focus();
             }
         }).open();
     }

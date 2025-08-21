@@ -22,7 +22,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
 
         // 로그인 안 되어 있으면 로그인 페이지로 리다이렉트
-        response.sendRedirect("/member/moveLogin");
+        response.sendRedirect("/");
         return false;
     }
 }

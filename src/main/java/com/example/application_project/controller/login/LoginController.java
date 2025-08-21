@@ -41,10 +41,10 @@ public class LoginController {
             session.setAttribute("loginId", result.getLoginId());
             session.setAttribute("name", result.getName());
             session.setAttribute("userRole", result.getUserRole());
-            return "redirect:/index";   // 로그인 성공 → 메인 페이지
+            return "redirect:/application/index";
         } else {
             model.addAttribute("errorMessage", result.getMessage());
-            return "login";  // 로그인 실패 → 다시 로그인 페이지
+            return "login";
         }
     }
 

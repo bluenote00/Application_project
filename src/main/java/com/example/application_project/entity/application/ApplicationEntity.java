@@ -17,20 +17,21 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ApplicationEntity {
 
-    @Id @Column(name = "SSN", nullable =false)
-    private String ssn;
+    @Id
+    @Column(name = "RCV_SEQ_NO", nullable =false)
+    private int rcvSeqNo;
 
     @Column(name = "RCV_D")
     private String rcvD;
 
-    @Column(name = "RCV_SEQ_NO")
-    private String rcvSeqNo;
+    @Column(name = "SSN")
+    private int ssn;
 
     @Column(name = "APPL_D")
     private String applD;
 
     @Column(name = "BIRTH_D")
-    private String birthD;
+    private int birthD;
 
     @Column(name = "HG_NM")
     private String hgNm;

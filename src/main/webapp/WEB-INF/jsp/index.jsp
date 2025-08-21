@@ -227,10 +227,11 @@
         <h1>회원 입회 신청</h1>
 
         <!-- 주민번호, 접수일자, 접수번호, 조회 -->
-        <form>
+        <form id="searchForm"
+              action="${pageContext.request.contextPath}/application/searchAppl" method="post" onsubmit="return validateForm()">
         <div class="form-grid single-line-full">
             <div>
-                <label for="jumin">주민번호</label>
+                <label for="주민번호">주민번호</label>
                 <input type="text" id="ssn" name="ssn" />
             </div>
             <div>
@@ -247,17 +248,18 @@
             </div>
         </div>
         </form>
+
         <hr/>
 
         <!-- 신청 정보 -->
         <div class="form-grid">
             <div>
                 <label for="신청일자">신청일자</label>
-                <input type="date" id="applD" name="applD"/>
+                <input type="date" id="applD" name="applD" value="${appl.applD}" />
             </div>
             <div>
                 <label for="신청구분">신청구분</label>
-                <select id="applClas" name="applClas">
+                <select id="applClas" name="applClas" value="${appl.applClas}">
                     <option value="">선택</option>
                     <option value="11">최초신규</option>
                     <option value="12">추가신규</option>
@@ -266,7 +268,7 @@
             </div>
             <div>
                 <label for="브랜드">브랜드</label>
-                <select id="brd" name="brd">
+                <select id="brd" name="brd" value="${appl.brd}">
                     <option value="">선택</option>
                     <option value="1">MASTER</option>
                     <option value="2">VISA</option>
@@ -279,15 +281,15 @@
         <div class="form-grid">
             <div>
                 <label for="성명_한글">성명(한글)</label>
-                <input type="text" id="hgNm" name="hgNm" />
+                <input type="text" id="hgNm" name="hgNm" value="${appl.hgNm}" />
             </div>
             <div>
                 <label for="성명_영어">성명(영어)</label>
-                <input type="text" id="engNm" name="engNm" />
+                <input type="text" id="engNm" name="engNm" value="${appl.engNm}" />
             </div>
             <div>
                 <label for="생년월일">생년월일</label>
-                <input type="date" id="birthD" name="birthD"/>
+                <input type="date" id="birthD" name="birthD" value="${appl.birthD}" />
             </div>
         </div>
 
@@ -295,11 +297,12 @@
         <div class="form-grid">
             <div>
                 <label for="결제일자">결제일자</label>
-                <input type="date" id="stlDD" name="stlDD"/>
+                <input type="date" id="stlDD" name="stlDD" value="${appl.stlDD}" />
             </div>
             <div>
                 <label for="결제방법">결제 방법</label>
-                <select id="stlMtd" name="stlMtd">
+                <select id="stlMtd" name="stlMtd" value="${appl.stlMtd}">
+                    <option value="">선택</option>
                     <option value="1">지로</option>
                     <option value="2">자동이체</option>
                     <option value="3">CMS</option>
@@ -307,7 +310,8 @@
             </div>
             <div>
                 <label for="결제은행">결제은행</label>
-                <select id="bnkCd" name="bnkCd">
+                <select id="bnkCd" name="bnkCd" value="${appl.bnkCd}">
+                    <option value="">선택</option>
                     <option value="002">산업은행</option>
                     <option value="003">기업은행</option>
                     <option value="004"국민은행</option>
@@ -329,7 +333,7 @@
         <div class="form-grid">
             <div>
                 <label for="결제계좌">결제계좌</label>
-                <input type="text" id="stlAct" name="stlAct" />
+                <input type="text" id="stlAct" name="stlAct" value="${appl.stlAct}" />
             </div>
             <div>
                 <label for="결제계좌">결제계좌 확인 여부</label>
@@ -337,7 +341,8 @@
             </div>
             <div>
                 <label for="청구서 발송 방법">청구서 발송 방법</label>
-                <select id="stmtSndMtd" name="stmtSndMtd">
+                <select id="stmtSndMtd" name="stmtSndMtd" value="${appl.stmtSndMtd}">
+                    <option value="">선택</option>
                     <option value="1">우편</option>
                     <option value="2">E-MAIL</option>
                     <option value="3">청구서 사절</option>
@@ -350,17 +355,17 @@
             <div>
                 <div class="post-code-wrapper">
                     <label for="우편번호">우편번호</label>
-                    <input type="text" id="billadrZip" name="billadrZip" placeholder="우편번호"/>
+                    <input type="text" id="billadrZip" name="billadrZip" value="${appl.billadrZip}" placeholder="우편번호" />
                     <button type="button" onclick="PostCode()">우편번호 찾기</button>
                 </div>
             </div>
             <div>
                 <label for="주소">주소</label>
-                <input type="text" id="billadrAdr1" name="billadrAdr1"/>
+                <input type="text" id="billadrAdr1" name="billadrAdr1" value="${appl.billadrAdr1}" />
             </div>
             <div>
                 <label for="상세주소">상세 주소</label>
-                <input type="text" id="billadrAdr2" name="billadrAdr2"/>
+                <input type="text" id="billadrAdr2" name="billadrAdr2" value="${appl.billadrAdr2}" />
             </div>
         </div>
 
@@ -368,15 +373,15 @@
         <div class="form-grid">
             <div>
                 <label for="이메일">이메일</label>
-                <input type="email" id="emailAdr" name="emailAdr"/>
+                <input type="email" id="emailAdr" name="emailAdr" value="${appl.emailAdr}" />
             </div>
             <div>
                 <label for="핸드폰">핸드폰 번호</label>
-                <input type="tel" id="hdpNo" name="hdpNo"/>
+                <input type="tel" id="hdpNo" name="hdpNo" value="${appl.hdpNo}" />
             </div>
             <div>
                 <label for="비밀번호">비밀번호</label>
-                <input type="password" id="scrtNo" name="scrtNo"/>
+                <input type="password" id="scrtNo" name="scrtNo" value="${appl.scrtNo}" />
             </div>
         </div>
 
@@ -384,11 +389,11 @@
         <div class="form-grid">
             <div>
                 <label for="불능구분">불능 구분</label>
-                <input type="text" id="impsbClas" name="impsbClas" readonly/>
+                <input type="text" id="impsbClas" name="impsbClas" value="${appl.impsbClas}" readonly/>
             </div>
             <div>
                 <label for="불능사유명">불능 사유명</label>
-                <input type="text" id="impsbCd" name="impsbCd" readonly/>
+                <input type="text" id="impsbCd" name="impsbCd" value="${appl.impsbCd}"  readonly/>
             </div>
         </div>
 
@@ -404,6 +409,7 @@
 </section>
 
 <script>
+    <%-- 탭메뉴 css --%>
     const currentPath = window.location.pathname;
     const tabs = document.querySelectorAll(".tabs ul li");
 
@@ -425,6 +431,27 @@
                 document.getElementById('billadrAdr2').focus();
             }
         }).open();
+    }
+
+    function validateForm() {
+        const ssn = document.getElementById('ssn').value;
+        const rcvD = document.getElementById('rcvD').value;
+        const rcvSeqNo = document.getElementById('rcvSeqNo').value;
+
+        if (!ssn) {
+            alert('주민번호를 입력해주세요.');
+            return;
+        }
+
+        if (!rcvD) {
+            alert('접수 일자를 입력해주세요.');
+            return;
+        }
+
+        if (!rcvSeqNo) {
+            alert('접수 일련 번호를 입력해주세요.');
+            return;
+        }
     }
 </script>
 </body>

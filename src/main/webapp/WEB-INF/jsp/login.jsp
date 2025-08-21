@@ -103,14 +103,8 @@
 
             <div class="links">
                 <button type="submit">Login</button>
-                <a href="${pageContext.request.contextPath}/member/moveJoin">Join</a>
             </div>
 
-            <div class="links">
-                <a href="${pageContext.request.contextPath}/member/movefindID">아이디 찾기</a>
-                |
-                <a href="${pageContext.request.contextPath}/member/movefindPW">비밀번호 찾기</a>
-            </div>
         </form>
     </div>
 </body>

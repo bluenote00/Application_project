@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 @Controller
 public class LoginController {
@@ -25,44 +24,35 @@ public class LoginController {
     // Get class name for logger
     private final String className = this.getClass().toString();
 
+    // 로그인 화면 이동
     @RequestMapping("/")
-    public String movelogin(@RequestParam Map<String, Object> paramMap, HttpSession session) throws Exception {
-
-        logger.info("+ Start LoginUserController.login");
-
+    public String moveLogin() {
         return "login";
     }
 
-    /**
-     * 로그인 처리
-     */
+    // 로그인
     @PostMapping("/member/login")
-    public String login(@ModelAttribute LoginEntity loginEntity,
+    public String login(@ModelAttribute LoginDto loginDto,
                         Model model, HttpSession session) {
 
-        LoginDto result = loginService.login(loginEntity);
+        LoginDto result = loginService.login(loginDto);
 
         if ("success".equals(result.getStatus())) {
             session.setAttribute("loginId", result.getLoginId());
             session.setAttribute("name", result.getName());
-            return "redirect:/";
+            session.setAttribute("userRole", result.getUserRole());
+            return "redirect:/index";   // 로그인 성공 → 메인 페이지
         } else {
             model.addAttribute("errorMessage", result.getMessage());
-            return "login";
+            return "login";  // 로그인 실패 → 다시 로그인 페이지
         }
     }
 
 
-
-    /**
-     * 로그아웃
-     */
-    @RequestMapping(value = "/member/logout")
-    public String loginOut(HttpSession session) {
-
+    // 로그아웃
+    @GetMapping("/member/logout")
+    public String logout(HttpSession session) {
         session.invalidate();
-
         return "login";
     }
-
 }

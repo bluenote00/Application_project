@@ -1,43 +1,35 @@
 package com.example.application_project.service.login;
 
 import com.example.application_project.dto.login.LoginDto;
-import com.example.application_project.dto.login.LoginResponseDto;
-import com.example.application_project.entity.login.LoginEntity;
 import com.example.application_project.repository.login.LoginRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class LoginService {
 
-    @Autowired
-    private LoginRepository loginRepository;
+    private final LoginRepository loginRepository;
 
-    @Autowired
-    private LoginDto loginDto;
-
-
-    /**
-     * 로그인
-     */
-    public LoginDto login(LoginEntity loginEntity) {
-        return loginRepository.findByLoginId(loginEntity.getLoginId())
+    public LoginDto login(LoginDto loginDto) {
+        return loginRepository.findByLoginId(loginDto.getLoginId())
                 .map(user -> {
-                    if (loginEntity.getLoginPw().equals(user.getLoginPw())) {
-                        return loginDto.builder()
+                    if (loginDto.getLoginPw().equals(user.getLoginPw())) {
+                        return LoginDto.builder()
                                 .status("success")
                                 .message("로그인되었습니다.")
                                 .loginId(user.getLoginId())
                                 .name(user.getName())
+                                .userRole(user.getUserRole())
                                 .build();
                     } else {
-                        return loginDto.builder()
+                        return LoginDto.builder()
                                 .status("fail")
                                 .message("잘못된 비밀번호입니다.")
                                 .build();
                     }
                 })
-                .orElse(loginDto.builder()
+                .orElse(LoginDto.builder()
                         .status("null")
                         .message("존재하지 않는 회원입니다.")
                         .build());

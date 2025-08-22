@@ -9,8 +9,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
+
 @Entity
-@Table(name = "APPLICATION")
+@Table(name = "RCVAPPL")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,16 +25,16 @@ public class ApplicationEntity {
     private int rcvSeqNo;
 
     @Column(name = "RCV_D")
-    private String rcvD;
+    private LocalDate rcvD;
 
     @Column(name = "SSN")
-    private int ssn;
+    private String ssn;
 
     @Column(name = "APPL_D")
     private String applD;
 
     @Column(name = "BIRTH_D")
-    private int birthD;
+    private String birthD;
 
     @Column(name = "HG_NM")
     private String hgNm;

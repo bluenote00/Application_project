@@ -226,27 +226,26 @@
     <div class="tab-content active" id="tab1">
         <h1>회원 입회 신청</h1>
 
-        <!-- 주민번호, 접수일자, 접수번호, 조회 -->
-        <form id="searchForm"
-              action="${pageContext.request.contextPath}/application/searchAppl" method="post" onsubmit="return validateForm()">
-        <div class="form-grid single-line-full">
-            <div>
-                <label for="주민번호">주민번호</label>
-                <input type="text" id="ssn" name="ssn" />
+        <!-- 주민번호, 접수일자, 접수번호 조회 -->
+        <form method="post" action="${pageContext.request.contextPath}/application/searchAppl">
+            <div class="form-grid single-line-full">
+                <div>
+                    <label for="주민번호">주민번호</label>
+                    <input type="text" id="ssn" name="ssn" value="${appl.ssn}" />
+                </div>
+                <div>
+                    <label for="접수일자">접수일자</label>
+                    <input type="date" id="rcvD" name="rcvD" value="${appl.rcvD}" />
+                </div>
+                <div>
+                    <label for="접수번호">접수 일련 번호</label>
+                    <input type="text" id="rcvSeqNo" name="rcvSeqNo" value="${appl.rcvSeqNo}" />
+                </div>
+                <div class="button-cell">
+                    <label>&nbsp;</label>
+                    <button type="submit">조회</button>
+                </div>
             </div>
-            <div>
-                <label for="접수일자">접수일자</label>
-                <input type="date" id="rcvD" name="rcvD" />
-            </div>
-            <div>
-                <label for="접수번호">접수 일련 번호</label>
-                <input type="text" id="rcvSeqNo" name="rcvSeqNo" />
-            </div>
-            <div class="button-cell">
-                <label>&nbsp;</label>
-                <button type="submit">조회</button>
-            </div>
-        </div>
         </form>
 
         <hr/>
@@ -297,7 +296,7 @@
         <div class="form-grid">
             <div>
                 <label for="결제일자">결제일자</label>
-                <input type="date" id="stlDD" name="stlDD" value="${appl.stlDD}" />
+                <input type="date" id="stlDd" name="stlDd" value="${appl.stlDd}" />
             </div>
             <div>
                 <label for="결제방법">결제 방법</label>
@@ -314,7 +313,7 @@
                     <option value="">선택</option>
                     <option value="002">산업은행</option>
                     <option value="003">기업은행</option>
-                    <option value="004"국민은행</option>
+                    <option value="004">국민은행</option>
                     <option value="005">외환은행</option>
                     <option value="007">수협중앙회</option>
                     <option value="011">농협중앙회</option>
@@ -440,18 +439,19 @@
 
         if (!ssn) {
             alert('주민번호를 입력해주세요.');
-            return;
+            return false;
         }
 
         if (!rcvD) {
             alert('접수 일자를 입력해주세요.');
-            return;
+            return false;
         }
 
         if (!rcvSeqNo) {
             alert('접수 일련 번호를 입력해주세요.');
-            return;
+            return false;
         }
+        return true;
     }
 </script>
 </body>

@@ -3,6 +3,8 @@ package com.example.application_project.controller.application;
 import com.example.application_project.entity.application.ApplicationEntity;
 import com.example.application_project.service.application.ApplicationService;
 import lombok.RequiredArgsConstructor;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Controller
@@ -18,6 +22,12 @@ import java.util.Optional;
 public class ApplicationController {
 
     private final ApplicationService applicationService;
+
+    // Set logger
+    private final Logger logger = LogManager.getLogger(this.getClass());
+
+    // Get class name for logger
+    private final String className = this.getClass().toString();
 
     // 입회신청서 첫 페이지
     @GetMapping("/index")
@@ -53,17 +63,26 @@ public class ApplicationController {
     @PostMapping("/searchAppl")
     public String searchAppl(
             @RequestParam("rcvSeqNo") int rcvSeqNo,
-            @RequestParam("ssn") int ssn,
-            @RequestParam("rcvD") String rcvD,
+            @RequestParam("ssn") String ssn,
+            @RequestParam("rcvD") String rcvDStr,
             Model model
     ) {
+
+        LocalDate rcvD = LocalDate.parse(rcvDStr, DateTimeFormatter.ISO_DATE);
+
+        logger.info("+ Start " + className + " 접수 번호: " + rcvSeqNo + ", 주민번호: " + ssn + ", 접수일자: " + rcvD);
+
         Optional<ApplicationEntity> result = applicationService.searchAppl(ssn, rcvD, rcvSeqNo);
+
+        logger.info("+ Start " + className + " 조회 결과 " + result);
 
         if (result.isPresent()) {
             model.addAttribute("appl", result.get());
+
         } else {
             model.addAttribute("error", "조회 결과가 없습니다.");
         }
+
         return "index";
     }
 

@@ -5,6 +5,7 @@ import com.example.application_project.repository.application.ApplicationReposit
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -14,7 +15,7 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
 
     // 입회신청서 조회
-    public Optional<ApplicationEntity> searchAppl(int ssn, String rcvD, int rcvSeqNo) {
+    public Optional<ApplicationEntity> searchAppl(String ssn, LocalDate rcvD, int rcvSeqNo) {
         return applicationRepository.findBySsnAndRcvDAndRcvSeqNo(ssn, rcvD, rcvSeqNo);
     }
 }

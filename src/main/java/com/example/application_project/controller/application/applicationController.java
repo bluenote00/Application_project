@@ -1,5 +1,6 @@
 package com.example.application_project.controller.application;
 
+import com.example.application_project.dto.application.ApplicationDto;
 import com.example.application_project.entity.application.ApplicationEntity;
 import com.example.application_project.service.application.ApplicationService;
 import lombok.RequiredArgsConstructor;
@@ -7,10 +8,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -62,7 +60,7 @@ public class ApplicationController {
     // 입회신청서 조회
     @PostMapping("/searchAppl")
     public String searchAppl(
-            @RequestParam("rcvSeqNo") int rcvSeqNo,
+            @RequestParam("rcvSeqNo") String rcvSeqNo,
             @RequestParam("ssn") String ssn,
             @RequestParam("rcvD") String rcvDStr,
             Model model
@@ -86,9 +84,15 @@ public class ApplicationController {
         return "index";
     }
 
-    // 입회신청서 신청 접수
+    // 입회신청서 등록
     @PostMapping("/insertAppl")
-    public String insertAppl() {
+    public String insertAppl(@ModelAttribute ApplicationDto applicationDto) {
+
+        logger.info("+ Start " + className + " 입회신청서 등록 " + applicationDto);
+
+        applicationService.insertApplication(applicationDto);
+
+        logger.info("+ End " + className + " 등록 결과 " + applicationDto);
 
         return "redirect:/application/index";
     }

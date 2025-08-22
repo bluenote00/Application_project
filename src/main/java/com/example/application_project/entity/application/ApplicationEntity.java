@@ -20,9 +20,10 @@ import java.time.LocalDate;
 @Builder
 public class ApplicationEntity {
 
+
     @Id
-    @Column(name = "RCV_SEQ_NO", nullable =false)
-    private int rcvSeqNo;
+    @Column(name = "RCV_SEQ_NO", nullable =false, length = 11)
+    private String rcvSeqNo;
 
     @Column(name = "RCV_D")
     private LocalDate rcvD;
@@ -31,10 +32,10 @@ public class ApplicationEntity {
     private String ssn;
 
     @Column(name = "APPL_D")
-    private String applD;
+    private LocalDate applD;
 
     @Column(name = "BIRTH_D")
-    private String birthD;
+    private LocalDate birthD;
 
     @Column(name = "HG_NM")
     private String hgNm;
@@ -52,7 +53,7 @@ public class ApplicationEntity {
     private String bnkCd;
 
     @Column(name = "STL_DD")
-    private String stlDd;
+    private LocalDate stlDd;
 
     @Column(name = "MGT_BBRN")
     private String mgtBbrn;

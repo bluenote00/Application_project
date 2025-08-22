@@ -227,7 +227,7 @@
         <h1>회원 입회 신청</h1>
 
         <!-- 주민번호, 접수일자, 접수번호 조회 -->
-        <form method="post" action="${pageContext.request.contextPath}/application/searchAppl">
+        <form method="post">
             <div class="form-grid single-line-full">
                 <div>
                     <label for="주민번호">주민번호</label>
@@ -243,10 +243,10 @@
                 </div>
                 <div class="button-cell">
                     <label>&nbsp;</label>
-                    <button type="submit">조회</button>
+                    <button type="submit" formaction="${pageContext.request.contextPath}/application/searchAppl"
+                    onclick="validateForm()">조회</button>
                 </div>
             </div>
-        </form>
 
         <hr/>
 
@@ -392,18 +392,20 @@
             </div>
             <div>
                 <label for="불능사유명">불능 사유명</label>
-                <input type="text" id="impsbCd" name="impsbCd" value="${appl.impsbCd}"  readonly/>
+                <input type="text" id="impsbCd" name="impsbCd" value="${appl.impsbCd}" readonly/>
             </div>
         </div>
 
         <hr/>
 
         <div class="button-row">
-            <button type="submit">등록</button>
+            <button type="submit" formaction="${pageContext.request.contextPath}/application/insertAppl">등록</button>
             <button type="submit">수정</button>
-            <button type="reset">초기화</button>
+            <button type="button" onclick="clearForm()">초기화</button>
         </div>
+        </form>
     </div>
+
 
 </section>
 
@@ -420,6 +422,17 @@
             tab.classList.remove("active");
         }
     });
+
+    <%-- 초기화 버튼 --%>
+    function clearForm() {
+        document.querySelectorAll("form input, form select, form textarea").forEach(el => {
+            if (el.type === "checkbox" || el.type === "radio") {
+                el.checked = false;
+            } else {
+                el.value = "";
+            }
+        });
+    }
 
     function PostCode() {
         new daum.Postcode({

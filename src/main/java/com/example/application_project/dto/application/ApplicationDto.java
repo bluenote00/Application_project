@@ -18,13 +18,13 @@ public class ApplicationDto {
     private LocalDate rcvD;
     private String ssn;
     private LocalDate applD;
-    private LocalDate birthD;
+    private String birthD;
     private String hgNm;
     private String engNm;
     private String stlMtd;
     private String stlAct;
     private String bnkCd;
-    private LocalDate stlDd;
+    private String stlDd;
     private String mgtBbrn;
     private String applClas;
     private String stmtSndMtd;

@@ -249,8 +249,7 @@
                 </div>
                 <div class="button-cell">
                     <label>&nbsp;</label>
-                    <button type="submit" formaction="${pageContext.request.contextPath}/application/searchAppl"
-                    onclick="validateForm()">조회</button>
+                    <button type="submit" formaction="${pageContext.request.contextPath}/application/searchAppl" onclick="validateForm()">조회</button>
                 </div>
             </div>
 
@@ -294,7 +293,7 @@
             </div>
             <div>
                 <label for="생년월일">생년월일</label>
-                <input type="date" id="birthD" name="birthD" value="${appl.birthD}" />
+                <input type="text" id="birthD" name="birthD" value="${appl.birthD}" readonly />
             </div>
         </div>
 
@@ -386,7 +385,7 @@
         <div class="form-grid">
             <div>
                 <label for="이메일">이메일</label>
-                <input type="email" id="emailAdr" name="emailAdr" value="${appl.emailAdr}" />
+                <input type="text" id="emailAdr" name="emailAdr" value="${appl.emailAdr}" />
             </div>
             <div>
                 <label for="핸드폰">핸드폰 번호</label>
@@ -424,6 +423,8 @@
 </section>
 
 <script>
+    let ssnChecked = false;
+
     <%-- 탭메뉴 css --%>
     const currentPath = window.location.pathname;
     const tabs = document.querySelectorAll(".tabs ul li");
@@ -484,22 +485,11 @@
     function filterToNumbers(input) {
         const messageSpan = document.getElementById('ssnCheckMessage');
 
-        var regex = /^[0-9]{6}(?:0[1-9]|1[0-2])(?:0[1-9]|[1-2][0-9]|3[0-1])[0-9]{6}$|^[0-9]{7}(?:0[1-9]|1[0-2])(?:0[1-9]|[1-2][0-9]|3[0-1])[0-9]{3}$|^[0-9]{13}$/;
+        // 생년월일에도 같이 입력
+        const birthDInput = document.getElementById('birthD');
 
-        // 숫자만 남기기 (하이픈 제외)
+        // 숫자만 입력 가능
         let numbers = input.value.replace(/[^0-9]/g, '');
-
-        // 자리 자리 검사
-        if (numbers.length >= 3) {
-            const thirdDigit = numbers.charAt(2);
-            const sevenDigit = numbers.charAt(6);
-            if (thirdDigit !== '0' && thirdDigit !== '1' && sevenDigit !== '1'
-                && sevenDigit !== '2' && sevenDigit !== '3' && sevenDigit !== '4') {
-                messageSpan.textContent = '올바른 주민번호를 입력해주세요';
-            } else {
-                messageSpan.textContent = '';
-            }
-        }
 
         // 하이픈 추가
         if (numbers.length > 6) {
@@ -508,18 +498,99 @@
             input.value = numbers;
         }
 
-        // 주민번호 자릿수 유효성 검사
+        // 자리수 검사 (총 13자리여야 함, 하이픈 제외)
         if (numbers.length !== 13) {
             messageSpan.textContent = '주민번호 13자리를 전부 입력해주세요';
-        } else {
-            // 세 번째 자리 유효성 통과했을 경우에만 메시지 제거
-            if (numbers.charAt(2) === '0' || numbers.charAt(2) === '1'
-                || numbers.charAt(6) === '1' || numbers.charAt(6) === '2'
-                || numbers.charAt(6) === '3' || numbers.charAt(6) === '4') {
-                messageSpan.textContent = '';
-            }
+            birthDInput.value = "";
+
+            return;
         }
+
+        // 생년월일 + 성별 코드로 출생년도 계산
+        const yy = parseInt(numbers.substring(0, 2), 10);
+        const mm = parseInt(numbers.substring(2, 4), 10);
+        const dd = parseInt(numbers.substring(4, 6), 10);
+        const genderCode = numbers.charAt(6);
+
+        // 연도 계산 (세기 구분)
+        let fullYear;
+        if (genderCode === '1' || genderCode === '2' || genderCode === '5' || genderCode === '6') {
+            fullYear = 1900 + yy;
+        } else if (genderCode === '3' || genderCode === '4' || genderCode === '7' || genderCode === '8') {
+            fullYear = 2000 + yy;
+        } else {
+            messageSpan.textContent = '올바른 주민번호를 입력해주세요';
+            birthDInput.value = "";
+
+            return;
+        }
+
+        // 생년월일 input에 값 세팅
+        birthDInput.value = fullYear + String(mm).padStart(2, '0') + String(dd).padStart(2, '0');
+
+        // 나이 계산
+        const today = new Date();
+        let age = today.getFullYear() - fullYear;
+        if (
+            today.getMonth() + 1 < mm ||
+            (today.getMonth() + 1 === mm && today.getDate() < dd)
+        ) {
+            age--;
+        }
+
+        // 미성년자 체크
+        if (age < 19) {
+            messageSpan.textContent = '미성년자는 신청할 수 없습니다';
+            return;
+        }
+
+        // 날짜 유효성 체크
+        const birthDate = new Date(fullYear, mm - 1, dd);
+        if (birthDate.getFullYear() !== fullYear || birthDate.getMonth() + 1 !== mm || birthDate.getDate() !== dd) {
+            messageSpan.textContent = '유효하지 않은 생년월일입니다';
+
+            return;
+        }
+
+        // 체크디지트 검증
+        const multipliers = [2,3,4,5,6,7,8,9,2,3,4,5];
+        let sum = 0;
+        for (let i = 0; i < 12; i++) {
+            sum += parseInt(numbers.charAt(i), 10) * multipliers[i];
+        }
+        const checkDigit = (11 - (sum % 11)) % 10;
+        if (checkDigit !== parseInt(numbers.charAt(12), 10)) {
+            messageSpan.textContent = '주민번호 검증에 실패했습니다';
+            return;
+        }
+
+        // 모든 검사 통과
+        messageSpan.textContent = '';
+        ssnChecked = true;
     }
+
+    // DB 저장 시 '-' 제거
+    // document.querySelector("form").addEventListener("submit", function() {
+    //     const ssnInput = document.getElementById("ssn");
+    //     ssnInput.value = ssnInput.value.replace(/-/g, '');
+    // });
+
+    // 신청 날짜는 현재 날짜로 디폴트 처리
+    window.addEventListener("DOMContentLoaded", () => {
+        const applD = document.getElementById("applD");
+        if (!applD.value) {
+            const today = new Date().toISOString().split("T")[0];
+            applD.value = today;
+        }
+    });
+
+    // DB 저장시에는 주민번호 마스킹 제거
+    document.querySelector("form").addEventListener("submit", function(event) {
+        const ssnInput = document.getElementById("ssn");
+
+        // 화면 표시용 masked value에서 '-'와 '*' 제거
+        ssnInput.value = ssnInput.value.replace(/[-*]/g, '');
+    });
 </script>
 </body>
 </html>

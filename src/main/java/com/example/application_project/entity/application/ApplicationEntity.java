@@ -35,7 +35,7 @@ public class ApplicationEntity {
     private LocalDate applD;
 
     @Column(name = "BIRTH_D")
-    private LocalDate birthD;
+    private String birthD;
 
     @Column(name = "HG_NM")
     private String hgNm;
@@ -53,7 +53,7 @@ public class ApplicationEntity {
     private String bnkCd;
 
     @Column(name = "STL_DD")
-    private LocalDate stlDd;
+    private String stlDd;
 
     @Column(name = "MGT_BBRN")
     private String mgtBbrn;

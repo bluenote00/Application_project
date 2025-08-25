@@ -90,15 +90,12 @@ public class ApplicationController {
 
         logger.info("+ Start " + className + " 입회신청서 등록 " + applicationDto);
 
-
         applicationService.insertApplication(applicationDto);
 
         logger.info("+ End " + className + " 등록 결과 " + applicationDto);
 
         return "redirect:/application/index";
     }
-
-    // 주민번호 체크디지트
 
 
 

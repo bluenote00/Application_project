@@ -98,5 +98,8 @@ public class ApplicationController {
         return "redirect:/application/index";
     }
 
+    // 주민번호 체크디지트
+
+
 
 }

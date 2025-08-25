@@ -165,11 +165,15 @@
         }
 
         /* 주민번호/접수일자/접수번호/조회 버튼 한 줄 */
+        span#ssnCheckMessage {
+            font-size: 13px;
+            color: #ff0000;
+        }
+
         .form-grid.single-line-full {
             display: grid;
             grid-template-columns: repeat(3, 1fr) 120px; /* 버튼 고정 폭 */
             gap: 15px 20px;
-            align-items: end;
         }
 
         .form-grid.single-line-full .button-cell button {
@@ -231,7 +235,9 @@
             <div class="form-grid single-line-full">
                 <div>
                     <label for="주민번호">주민번호</label>
-                    <input type="text" id="ssn" name="ssn" value="${appl.ssn}" />
+                    <input type="text" id="ssn" name="ssn" value="${appl.ssn}"
+                           maxlength="14" oninput="filterToNumbers(this)" />
+                    <span id="ssnCheckMessage"></span>
                 </div>
                 <div>
                     <label for="접수일자">접수일자</label>
@@ -296,7 +302,15 @@
         <div class="form-grid">
             <div>
                 <label for="결제일자">결제일자</label>
-                <input type="date" id="stlDd" name="stlDd" value="${appl.stlDd}" />
+                <select id="stlDd" name="stlDd" value="${appl.stlDd}">
+                    <option value="">선택</option>
+                    <option value="05">매달 5일</option>
+                    <option value="10">매달 10일</option>
+                    <option value="15">매달 15일</option>
+                    <option value="20">매달 20일</option>
+                    <option value="25">매달 25일</option>
+                    <option value="99">매달 말일</option>
+                </select>
             </div>
             <div>
                 <label for="결제방법">결제 방법</label>
@@ -437,7 +451,6 @@
     function PostCode() {
         new daum.Postcode({
             oncomplete: function (data) {
-
                 document.getElementById('billadrZip').value = data.zonecode;
                 document.getElementById('billadrAdr1').value = data.address;
                 document.getElementById('billadrAdr2').focus();
@@ -465,6 +478,47 @@
             return false;
         }
         return true;
+    }
+
+    // 주민번호 유효성 검사
+    function filterToNumbers(input) {
+        const messageSpan = document.getElementById('ssnCheckMessage');
+
+        var regex = /^[0-9]{6}(?:0[1-9]|1[0-2])(?:0[1-9]|[1-2][0-9]|3[0-1])[0-9]{6}$|^[0-9]{7}(?:0[1-9]|1[0-2])(?:0[1-9]|[1-2][0-9]|3[0-1])[0-9]{3}$|^[0-9]{13}$/;
+
+        // 숫자만 남기기 (하이픈 제외)
+        let numbers = input.value.replace(/[^0-9]/g, '');
+
+        // 자리 자리 검사
+        if (numbers.length >= 3) {
+            const thirdDigit = numbers.charAt(2);
+            const sevenDigit = numbers.charAt(6);
+            if (thirdDigit !== '0' && thirdDigit !== '1' && sevenDigit !== '1'
+                && sevenDigit !== '2' && sevenDigit !== '3' && sevenDigit !== '4') {
+                messageSpan.textContent = '올바른 주민번호를 입력해주세요';
+            } else {
+                messageSpan.textContent = '';
+            }
+        }
+
+        // 하이픈 추가
+        if (numbers.length > 6) {
+            input.value = numbers.substring(0, 6) + '-' + numbers.substring(6, 13);
+        } else {
+            input.value = numbers;
+        }
+
+        // 주민번호 자릿수 유효성 검사
+        if (numbers.length !== 13) {
+            messageSpan.textContent = '주민번호 13자리를 전부 입력해주세요';
+        } else {
+            // 세 번째 자리 유효성 통과했을 경우에만 메시지 제거
+            if (numbers.charAt(2) === '0' || numbers.charAt(2) === '1'
+                || numbers.charAt(6) === '1' || numbers.charAt(6) === '2'
+                || numbers.charAt(6) === '3' || numbers.charAt(6) === '4') {
+                messageSpan.textContent = '';
+            }
+        }
     }
 </script>
 </body>

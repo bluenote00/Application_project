@@ -385,7 +385,8 @@
         <div class="form-grid">
             <div>
                 <label for="이메일">이메일</label>
-                <input type="text" id="emailAdr" name="emailAdr" value="${appl.emailAdr}" />
+                <input type="text" id="emailAdr" name="emailAdr" value="${appl.emailAdr}" oninput="checkEmail(this)" />
+                <span id="emailCheckMessage"></span>
             </div>
             <div>
                 <label for="핸드폰">핸드폰 번호</label>
@@ -606,6 +607,24 @@
             input.value = input.value.replace(/[^0-9]/g, '');
         }
 
+
+        // 이메일 유효성 검사
+        function checkEmail() {
+            const messageSpan = document.getElementById('emailCheckMessage');
+
+            const emailInput = document.getElementById('email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailRegex.test(emailInput)) {
+                messageSpan.textContent = '올바른 이메일 주소를 작성해주세요.';
+                return false;
+            }
+
+            messageSpan.textContent = '';
+            return true;
+        }
+
+
         // DB 저장시에는 주민번호 마스킹 제거
         document.querySelector("form").addEventListener("submit", function (event) {
             const ssnInput = document.getElementById("ssn");
@@ -614,11 +633,11 @@
             ssnInput.value = ssnInput.value.replace(/[-*]/g, '');
         });
 
-    // DB 저장 시 '-' 제거
-    document.querySelector("form").addEventListener("submit", function() {
-        const hdpNoInput = document.getElementById("hdpNo");
-        hdpNoInput.value = hdpNoInput.value.replace(/-/g, '');
-    });
+        // DB 저장 시 '-' 제거
+        document.querySelector("form").addEventListener("submit", function() {
+            const hdpNoInput = document.getElementById("hdpNo");
+            hdpNoInput.value = hdpNoInput.value.replace(/-/g, '');
+        });
 
 </script>
 </body>

@@ -285,11 +285,11 @@
         <div class="form-grid">
             <div>
                 <label for="성명_한글">성명(한글)</label>
-                <input type="text" id="hgNm" name="hgNm" value="${appl.hgNm}" />
+                <input type="text" id="hgNm" name="hgNm" value="${appl.hgNm}" oninput="allowKoreanOnly(this)" />
             </div>
             <div>
                 <label for="성명_영어">성명(영어)</label>
-                <input type="text" id="engNm" name="engNm" value="${appl.engNm}" />
+                <input type="text" id="engNm" name="engNm" value="${appl.engNm}" oninput="allowEnglishOnly(this)" />
             </div>
             <div>
                 <label for="생년월일">생년월일</label>
@@ -389,11 +389,13 @@
             </div>
             <div>
                 <label for="핸드폰">핸드폰 번호</label>
-                <input type="tel" id="hdpNo" name="hdpNo" value="${appl.hdpNo}" />
+                <input type="tel" id="hdpNo" name="hdpNo" value="${appl.hdpNo}"
+                oninput="filterToPhone(this)" />
             </div>
             <div>
                 <label for="비밀번호">비밀번호</label>
-                <input type="password" id="scrtNo" name="scrtNo" value="${appl.scrtNo}" />
+                <input type="password" maxlength="4" id="scrtNo" name="scrtNo" value="${appl.scrtNo}"
+                oninput="allowNumbersOnly(this)"/>
             </div>
         </div>
 
@@ -569,28 +571,55 @@
         ssnChecked = true;
     }
 
-    // DB 저장 시 '-' 제거
-    // document.querySelector("form").addEventListener("submit", function() {
-    //     const ssnInput = document.getElementById("ssn");
-    //     ssnInput.value = ssnInput.value.replace(/-/g, '');
-    // });
+        // 신청 날짜는 현재 날짜로 디폴트 처리
+        window.addEventListener("DOMContentLoaded", () => {
+            const applD = document.getElementById("applD");
+            if (!applD.value) {
+                const today = new Date().toISOString().split("T")[0];
+                applD.value = today;
+            }
+        });
 
-    // 신청 날짜는 현재 날짜로 디폴트 처리
-    window.addEventListener("DOMContentLoaded", () => {
-        const applD = document.getElementById("applD");
-        if (!applD.value) {
-            const today = new Date().toISOString().split("T")[0];
-            applD.value = today;
+        // 영문 이름 입력칸 영문만 입력 가능
+        function allowEnglishOnly(input) {
+            input.value = input.value.replace(/[^a-zA-Z\s]/g, '');
         }
+
+
+        // 핸드폰 번호 입력시 하이픈 자동 추가
+        function filterToPhone(input) {
+            // 숫자만 남기기
+            let numbers = input.value.replace(/[^0-9]/g, '');
+
+            if (numbers.length <= 3) {
+                input.value = numbers;
+            } else if (numbers.length <= 7) {
+                input.value = numbers.substring(0, 3) + '-' + numbers.substring(3);
+            } else {
+                input.value = numbers.substring(0, 3) + '-' + numbers.substring(3, 7) + '-' + numbers.substring(7, 11);
+            }
+        }
+
+
+        // 비밀번호 입력시, 숫자만 가능
+        function allowNumbersOnly(input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+
+        // DB 저장시에는 주민번호 마스킹 제거
+        document.querySelector("form").addEventListener("submit", function (event) {
+            const ssnInput = document.getElementById("ssn");
+
+            // 화면 표시용 masked value에서 '-'와 '*' 제거
+            ssnInput.value = ssnInput.value.replace(/[-*]/g, '');
+        });
+
+    // DB 저장 시 '-' 제거
+    document.querySelector("form").addEventListener("submit", function() {
+        const hdpNoInput = document.getElementById("hdpNo");
+        hdpNoInput.value = hdpNoInput.value.replace(/-/g, '');
     });
 
-    // DB 저장시에는 주민번호 마스킹 제거
-    document.querySelector("form").addEventListener("submit", function(event) {
-        const ssnInput = document.getElementById("ssn");
-
-        // 화면 표시용 masked value에서 '-'와 '*' 제거
-        ssnInput.value = ssnInput.value.replace(/[-*]/g, '');
-    });
 </script>
 </body>
 </html>

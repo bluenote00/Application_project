@@ -18,10 +18,11 @@ import lombok.NoArgsConstructor;
 public class CardEntity {
 
     @Id
-    @Column(name = "CRD_NO", nullable =false)
+    @Column(name = "CRD_NO")
     private String crdNo;
 
-    @Column(name = "CUST_NO")
+    @Id
+    @Column(name = "CUST_NO", nullable =false)
     private String custNo;
 
     @Column(name = "MGT_BBRN")

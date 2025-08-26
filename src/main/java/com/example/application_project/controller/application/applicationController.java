@@ -7,11 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -59,30 +61,55 @@ public class ApplicationController {
 
     // 입회신청서 조회
     @PostMapping("/searchAppl")
-    public String searchAppl(
-            @RequestParam("rcvSeqNo") String rcvSeqNo,
-            @RequestParam("ssn") String ssn,
-            @RequestParam("rcvD") String rcvDStr,
-            Model model
-    ) {
+    @ResponseBody
+    public Map<String, Object> searchAppl(@RequestBody Map<String, String> params) {
 
-        LocalDate rcvD = LocalDate.parse(rcvDStr, DateTimeFormatter.ISO_DATE);
+        String ssn = params.get("ssn");
+        String rcvDStr = params.get("rcvD");
+        String rcvSeqNo = params.get("rcvSeqNo");
 
-        logger.info("+ Start " + className + " 접수 번호: " + rcvSeqNo + ", 주민번호: " + ssn + ", 접수일자: " + rcvD);
+        logger.info("+ Start " + className + " 접수 번호: " + rcvSeqNo + ", 주민번호: " + ssn + ", 접수일자: " + rcvDStr);
 
-        Optional<ApplicationEntity> result = applicationService.searchAppl(ssn, rcvD, rcvSeqNo);
+        Map<String, Object> result = new HashMap<>();
 
-        logger.info("+ Start " + className + " 조회 결과 " + result);
+        LocalDate rcvD = null;
 
-        if (result.isPresent()) {
-            model.addAttribute("appl", result.get());
-
-        } else {
-            model.addAttribute("message", "조회 결과가 없습니다.");
+        if (rcvDStr != null && !rcvDStr.isEmpty()) {
+            rcvD = LocalDate.parse(rcvDStr, DateTimeFormatter.ISO_DATE);
         }
 
-        return "index";
+        Optional<ApplicationEntity> appl = applicationService.searchAppl(ssn, rcvD, rcvSeqNo);
+
+        if (appl.isEmpty()) {
+            result.put("message", "조회 결과가 없습니다.");
+
+        } else {
+            ApplicationEntity entity = appl.get();
+
+            result.put("applD", entity.getApplD());
+            result.put("applClas", entity.getApplClas());
+            result.put("brd", entity.getBrd());
+            result.put("hgNm", entity.getHgNm());
+            result.put("engNm", entity.getEngNm());
+            result.put("birthD", entity.getBirthD());
+            result.put("stlDd", entity.getStlDd());
+            result.put("stlMtd", entity.getStlMtd());
+            result.put("bnkCd", entity.getBnkCd());
+            result.put("stlAct", entity.getStlAct());
+            result.put("billadrZip", entity.getBilladrZip());
+            result.put("billadrAdr1", entity.getBilladrAdr1());
+            result.put("billadrAdr2", entity.getBilladrAdr2());
+            result.put("emailAdr", entity.getEmailAdr());
+            result.put("hdpNo", entity.getHdpNo());
+            result.put("scrtNo", entity.getScrtNo());
+            result.put("impsbClas", entity.getImpsbClas());
+            result.put("impsbCd", entity.getImpsbCd());
+
+            logger.info("+ Start " + className + " 조회 결과 " + result);
+        }
+        return result;
     }
+
 
     // 입회신청서 등록
     @PostMapping("/insertAppl")

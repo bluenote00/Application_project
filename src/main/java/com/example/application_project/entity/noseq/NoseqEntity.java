@@ -21,6 +21,7 @@ public class NoseqEntity {
     @Column(name = "RCV_D", nullable =false)
     private String rcvD;
 
-    @Column(name = "RCV_SEQ_NO")
+    @Id
+    @Column(name = "RCV_SEQ_NO", nullable =false)
     private String rcvSeqNo;
 }

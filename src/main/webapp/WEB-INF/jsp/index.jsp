@@ -249,7 +249,7 @@
                 </div>
                 <div class="button-cell">
                     <label>&nbsp;</label>
-                    <button type="submit" formaction="${pageContext.request.contextPath}/application/searchAppl" onclick="validateForm()">조회</button>
+                    <button type="button" onclick="searchAppl()">조회</button>
                 </div>
             </div>
 
@@ -414,23 +414,17 @@
 
         <hr/>
 
-        <div class="button-row">
-            <button type="submit" formaction="${pageContext.request.contextPath}/application/insertAppl">등록</button>
-            <button type="submit">수정</button>
-            <button type="button" onclick="clearForm()">초기화</button>
-        </div>
+            <div class="button-row">
+                <button type="submit" formaction="${pageContext.request.contextPath}/application/insertAppl"
+                        onsubmit="return subValidateForm()">등록</button>
+                <button type="button">수정</button>
+                <button type="button" onclick="clearForm()">초기화</button>
+            </div>
         </form>
     </div>
 
 
 </section>
-
-<c:if test="${not empty message}">
-    <script>
-        alert("${message}");
-    </script>
-</c:if>
-
 <script>
     let ssnChecked = false;
     let emailChecked = false;
@@ -467,28 +461,6 @@
                 document.getElementById('billadrAdr2').focus();
             }
         }).open();
-    }
-
-    function validateForm() {
-        const ssn = document.getElementById('ssn').value;
-        const rcvD = document.getElementById('rcvD').value;
-        const rcvSeqNo = document.getElementById('rcvSeqNo').value;
-
-        if (!ssn) {
-            alert('주민번호를 입력해주세요.');
-            return false;
-        }
-
-        if (!rcvD) {
-            alert('접수 일자를 입력해주세요.');
-            return false;
-        }
-
-        if (!rcvSeqNo) {
-            alert('접수 일련 번호를 입력해주세요.');
-            return false;
-        }
-        return true;
     }
 
     // 주민번호 유효성 검사
@@ -628,21 +600,138 @@
             ssnChecked = true;
         }
 
-
-        // DB 저장시에는 주민번호 마스킹 제거
-        document.querySelector("form").addEventListener("submit", function (event) {
-            const ssnInput = document.getElementById("ssn");
-
-            // 화면 표시용 masked value에서 '-'와 '*' 제거
-            ssnInput.value = ssnInput.value.replace(/[-*]/g, '');
-        });
-
         // DB 저장 시 '-' 제거
         document.querySelector("form").addEventListener("submit", function() {
             const hdpNoInput = document.getElementById("hdpNo");
             hdpNoInput.value = hdpNoInput.value.replace(/-/g, '');
         });
 
+
+    // 조회 기능
+    function searchAppl() {
+        const ssn = document.getElementById("ssn").value;
+        const rcvD = document.getElementById("rcvD").value;
+        const rcvSeqNo = document.getElementById("rcvSeqNo").value;
+
+        if (!ssn) {
+            alert('주민번호를 입력해주세요.');
+            return false;
+        }
+
+        if (!rcvD) {
+            alert('접수 일자를 입력해주세요.');
+            return false;
+        }
+
+        if (!rcvSeqNo) {
+            alert('접수 일련 번호를 입력해주세요.');
+            return false;
+        }
+
+        fetch("${pageContext.request.contextPath}/application/searchAppl", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ssn, rcvD, rcvSeqNo })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                } else {
+                    for (let key in data) {
+                        const el = document.getElementById(key);
+                        if (el) el.value = data[key];
+                    }
+                }
+            })
+            .catch(err => console.error("조회 에러:", err));
+    }
+
+    // 등록 시 데이터 유효성 체크
+    function subValidateForm() {
+        const ssn = document.getElementById("ssn").value;
+        const applClas = document.getElementById("applClas").value;
+        const brd = document.getElementById("brd").value;
+        const hgNm = document.getElementById("hgNm").value;
+        const engNm = document.getElementById("engNm").value;
+        const stlDd = document.getElementById("stlDd").value;
+        const stlMtd = document.getElementById("stlMtd").value;
+        const bnkCd = document.getElementById("bnkCd").value;
+        const stlAct = document.getElementById("stlAct").value;
+        const stmtSndMtd = document.getElementById("stmtSndMtd").value;
+        const billadrZip = document.getElementById("billadrZip").value;
+        const billadrAdr1 = document.getElementById("billadrAdr1").value;
+        const billadrAdr2 = document.getElementById("billadrAdr2").value;
+        const emailAdr = document.getElementById("emailAdr").value;
+        const hdpNo = document.getElementById("hdpNo").value;
+        const scrtNo = document.getElementById("scrtNo").value;
+
+        if (!ssn) {
+            alert('주민번호를 입력해주세요.');
+            return false;
+        }
+        if (!applClas) {
+            alert('신청 구분을 선택해주세요');
+            return false;
+        }
+        if (!brd) {
+            alert('브랜드를 선택해주세요');
+            return false;
+        }
+        if (!hgNm) {
+            alert('한글 이름을 입력해주세요');
+            return false;
+        }
+        if (!engNm) {
+            alert('영문 이름을 입력해주세요');
+            return false;
+        }
+        if (!stlDd) {
+            alert('결제 일자를 입력해주세요');
+            return false;
+        }
+        if (!stlMtd) {
+            alert('결제 방법을 선택해주세요');
+            return false;
+        }
+        if (!bnkCd) {
+            alert('결제 은행을 선택해주세요');
+            return false;
+        }
+        if (!stlAct) {
+            alert('결제 계좌를 입력해주세요');
+            return false;
+        }
+        if (!stmtSndMtd) {
+            alert('청구서 발송 방법을 선택해주세요');
+            return false;
+        }
+        if (!billadrZip) {
+            alert('우편번호를 입력해주세요');
+            return false;
+        }
+        if (!billadrAdr1) {
+            alert('주소를 입력해주세요');
+            return false;
+        }
+        if (!billadrAdr2) {
+            alert('상세 주소를 입력해주세요');
+            return false;
+        }
+        if (!emailAdr) {
+            alert('이메일 주소를 입력해주세요');
+            return false;
+        }
+        if (!hdpNo) {
+            alert('핸드폰 번호를 입력해주세요');
+            return false;
+        }
+        if (!scrtNo) {
+            alert('비밀번호를 입력해주세요');
+            return false;
+        }
+            return true;
+    }
 </script>
 </body>
 </html>

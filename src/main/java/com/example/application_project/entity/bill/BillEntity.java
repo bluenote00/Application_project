@@ -16,9 +16,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class BillEntity {
-
     @Id
-    @Column(name = "STL_ACT", nullable = false)
+    @Column(name = "CUST_NO", nullable = false)
+    private String custNo;
+
+    @Column(name = "STL_ACT")
     private String stlAct;
 
     @Column(name = "BNK_CD")
@@ -32,9 +34,6 @@ public class BillEntity {
 
     @Column(name = "STL_DD")
     private String StlDd;
-
-    @Column(name = "CUST_NO")
-    private String custNo;
 
     @Column(name = "PRCS_CLAS")
     private String prcsClas;

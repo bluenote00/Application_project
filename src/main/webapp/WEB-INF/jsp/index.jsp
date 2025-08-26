@@ -165,7 +165,7 @@
         }
 
         /* 주민번호/접수일자/접수번호/조회 버튼 한 줄 */
-        span#ssnCheckMessage {
+        span.checkMessage {
             font-size: 13px;
             color: #ff0000;
         }
@@ -237,7 +237,7 @@
                     <label for="주민번호">주민번호</label>
                     <input type="text" id="ssn" name="ssn" value="${appl.ssn}"
                            maxlength="14" oninput="filterToNumbers(this)" />
-                    <span id="ssnCheckMessage"></span>
+                    <span id="ssnCheckMessage" class="checkMessage"></span>
                 </div>
                 <div>
                     <label for="접수일자">접수일자</label>
@@ -386,7 +386,7 @@
             <div>
                 <label for="이메일">이메일</label>
                 <input type="text" id="emailAdr" name="emailAdr" value="${appl.emailAdr}" oninput="checkEmail(this)" />
-                <span id="emailCheckMessage"></span>
+                <span id="emailCheckMessage" class="checkMessage"></span>
             </div>
             <div>
                 <label for="핸드폰">핸드폰 번호</label>
@@ -425,8 +425,15 @@
 
 </section>
 
+<c:if test="${not empty message}">
+    <script>
+        alert("${message}");
+    </script>
+</c:if>
+
 <script>
     let ssnChecked = false;
+    let emailChecked = false;
 
     <%-- 탭메뉴 css --%>
     const currentPath = window.location.pathname;
@@ -570,7 +577,7 @@
         // 모든 검사 통과
         messageSpan.textContent = '';
         ssnChecked = true;
-    }
+        }
 
         // 신청 날짜는 현재 날짜로 디폴트 처리
         window.addEventListener("DOMContentLoaded", () => {
@@ -586,7 +593,6 @@
             input.value = input.value.replace(/[^a-zA-Z\s]/g, '');
         }
 
-
         // 핸드폰 번호 입력시 하이픈 자동 추가
         function filterToPhone(input) {
             // 숫자만 남기기
@@ -601,19 +607,17 @@
             }
         }
 
-
         // 비밀번호 입력시, 숫자만 가능
         function allowNumbersOnly(input) {
             input.value = input.value.replace(/[^0-9]/g, '');
         }
 
-
         // 이메일 유효성 검사
         function checkEmail() {
             const messageSpan = document.getElementById('emailCheckMessage');
 
-            const emailInput = document.getElementById('email').value.trim();
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const emailInput = document.getElementById('emailAdr').value.trim();
+            const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
             if (!emailRegex.test(emailInput)) {
                 messageSpan.textContent = '올바른 이메일 주소를 작성해주세요.';
@@ -621,7 +625,7 @@
             }
 
             messageSpan.textContent = '';
-            return true;
+            ssnChecked = true;
         }
 
 

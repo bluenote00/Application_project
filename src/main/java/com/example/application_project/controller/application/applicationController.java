@@ -78,7 +78,7 @@ public class ApplicationController {
             model.addAttribute("appl", result.get());
 
         } else {
-            model.addAttribute("error", "조회 결과가 없습니다.");
+            model.addAttribute("message", "조회 결과가 없습니다.");
         }
 
         return "index";

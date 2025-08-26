@@ -463,7 +463,7 @@
         }).open();
     }
 
-    // 주민번호 유효성 검사
+    // 주민번호 유효성 검사 + 마스킹
     function filterToNumbers(input) {
         const messageSpan = document.getElementById('ssnCheckMessage');
 

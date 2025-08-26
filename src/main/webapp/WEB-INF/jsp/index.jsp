@@ -231,12 +231,13 @@
         <h1>회원 입회 신청</h1>
 
         <!-- 주민번호, 접수일자, 접수번호 조회 -->
-        <form method="post">
+        <form method="post" onsubmit="return subValidateForm()">
             <div class="form-grid single-line-full">
                 <div>
                     <label for="주민번호">주민번호</label>
-                    <input type="text" id="ssn" name="ssn" value="${appl.ssn}"
-                           maxlength="14" oninput="filterToNumbers(this)" />
+                    <input type="text" id="ssn" value="${appl.ssn}"
+                           maxlength="14" oninput="filterToNumbers(this);" />
+                    <input type="hidden" id="ssnOriginal" name="ssn">
                     <span id="ssnCheckMessage" class="checkMessage"></span>
                 </div>
                 <div>
@@ -259,7 +260,7 @@
         <div class="form-grid">
             <div>
                 <label for="신청일자">신청일자</label>
-                <input type="date" id="applD" name="applD" value="${appl.applD}" />
+                <input type="date" id="applD" name="applD" value="${appl.applD}" readonly />
             </div>
             <div>
                 <label for="신청구분">신청구분</label>
@@ -285,7 +286,7 @@
         <div class="form-grid">
             <div>
                 <label for="성명_한글">성명(한글)</label>
-                <input type="text" id="hgNm" name="hgNm" value="${appl.hgNm}" oninput="allowKoreanOnly(this)" />
+                <input type="text" id="hgNm" name="hgNm" value="${appl.hgNm}" />
             </div>
             <div>
                 <label for="성명_영어">성명(영어)</label>
@@ -415,8 +416,7 @@
         <hr/>
 
             <div class="button-row">
-                <button type="submit" formaction="${pageContext.request.contextPath}/application/insertAppl"
-                        onsubmit="return subValidateForm()">등록</button>
+                <button type="submit" formaction="${pageContext.request.contextPath}/application/insertAppl">등록</button>
                 <button type="button">수정</button>
                 <button type="button" onclick="clearForm()">초기화</button>
             </div>
@@ -473,12 +473,6 @@
         // 숫자만 입력 가능
         let numbers = input.value.replace(/[^0-9]/g, '');
 
-        // 하이픈 추가
-        if (numbers.length > 6) {
-            input.value = numbers.substring(0, 6) + '-' + numbers.substring(6, 13);
-        } else {
-            input.value = numbers;
-        }
 
         // 자리수 검사 (총 13자리여야 함, 하이픈 제외)
         if (numbers.length !== 13) {
@@ -487,6 +481,9 @@
 
             return;
         }
+
+        // 하이픈 추가
+        input.value = numbers.substring(0, 6) + '-' + numbers.substring(6, 13);
 
         // 생년월일 + 성별 코드로 출생년도 계산
         const yy = parseInt(numbers.substring(0, 2), 10);
@@ -513,18 +510,13 @@
         // 나이 계산
         const today = new Date();
         let age = today.getFullYear() - fullYear;
-        if (
-            today.getMonth() + 1 < mm ||
-            (today.getMonth() + 1 === mm && today.getDate() < dd)
-        ) {
-            age--;
-        }
+        if (today.getMonth() + 1 < mm || (today.getMonth() + 1 === mm && today.getDate() < dd)) age--;
 
-        // 미성년자 체크
         if (age < 19) {
             messageSpan.textContent = '미성년자는 신청할 수 없습니다';
             return;
         }
+
 
         // 날짜 유효성 체크
         const birthDate = new Date(fullYear, mm - 1, dd);
@@ -597,7 +589,7 @@
             }
 
             messageSpan.textContent = '';
-            ssnChecked = true;
+            emailChecked = true;
         }
 
         // DB 저장 시 '-' 제거
@@ -670,6 +662,10 @@
             alert('주민번호를 입력해주세요.');
             return false;
         }
+        if (!ssnChecked) {
+            alert('올바른 주민등록 번호를 입력해주세요.');
+            return false;
+        }
         if (!applClas) {
             alert('신청 구분을 선택해주세요');
             return false;
@@ -722,6 +718,10 @@
             alert('이메일 주소를 입력해주세요');
             return false;
         }
+        if (!emailChecked) {
+            alert('올바른 이메일 주소를 입력해주세요.');
+            return false;
+        }
         if (!hdpNo) {
             alert('핸드폰 번호를 입력해주세요');
             return false;
@@ -732,6 +732,7 @@
         }
             return true;
     }
+
 </script>
 </body>
 </html>

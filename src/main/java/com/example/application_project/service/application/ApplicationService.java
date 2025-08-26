@@ -22,26 +22,25 @@ public class ApplicationService {
     }
 
     public void insertApplication(ApplicationDto dto) {
-        String todayStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            // 오늘 날짜
+            String todayStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
-        // DB에서 오늘 날짜의 최대 시퀀스 조회
-        String maxSeq = applicationRepository.findMaxSeqNoByDate(todayStr);
+            // DB에서 오늘 날짜의 최대 시퀀스 조회
+            String maxSeq = applicationRepository.findMaxSeqNoByDate(todayStr);
 
-        int nextSeq = 1;
-        if (maxSeq != null) {
-            // 뒤 3자리 숫자 추출 → +1
-            String seqPart = maxSeq.substring(8); // yyyyMMdd 이후 부분
-            nextSeq = Integer.parseInt(seqPart) + 1;
-        }
+            int nextSeq = 1;
+            if (maxSeq != null) {
+                String seqPart = maxSeq.substring(8);
+                nextSeq = Integer.parseInt(seqPart) + 1;
+            }
 
-        // 새로운 rcvSeqNo 생성 (예: 20250822 + 001)
-        String newRcvSeqNo = todayStr + String.format("%03d", nextSeq);
+            String newRcvSeqNo = todayStr + nextSeq;
 
-        ApplicationEntity entity = ApplicationEntity.builder()
+            ApplicationEntity entity = ApplicationEntity.builder()
                 .rcvSeqNo(newRcvSeqNo)
                 .rcvD(LocalDate.now())
                 .ssn(dto.getSsn())
-                .applD(dto.getApplD())
+                .applD(LocalDate.now())
                 .birthD(dto.getBirthD())
                 .hgNm(dto.getHgNm())
                 .engNm(dto.getEngNm())

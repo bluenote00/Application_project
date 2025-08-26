@@ -466,24 +466,28 @@
     // 주민번호 유효성 검사 + 마스킹
     function filterToNumbers(input) {
         const messageSpan = document.getElementById('ssnCheckMessage');
-
-        // 생년월일에도 같이 입력
         const birthDInput = document.getElementById('birthD');
+        const hiddenInput = document.getElementById('ssnOriginal'); // hidden input (원본 저장)
 
         // 숫자만 입력 가능
         let numbers = input.value.replace(/[^0-9]/g, '');
 
-
         // 자리수 검사 (총 13자리여야 함, 하이픈 제외)
-        if (numbers.length !== 13) {
+        if (numbers.length < 13) {
             messageSpan.textContent = '주민번호 13자리를 전부 입력해주세요';
             birthDInput.value = "";
-
+            hiddenInput.value = ""; // 원본 초기화
             return;
         }
 
-        // 하이픈 추가
-        input.value = numbers.substring(0, 6) + '-' + numbers.substring(6, 13);
+        // 원본값 저장 (13자리)
+        hiddenInput.value = numbers;
+
+        // 하이픈 포함 원본값 만들기
+        const originalFormatted = numbers.substring(0, 6) + '-' + numbers.substring(6, 13);
+
+        // 화면에는 8번째 자리부터 마스킹 처리
+        input.value = numbers.substring(0, 6) + '-' + numbers.charAt(6) + '******';
 
         // 생년월일 + 성별 코드로 출생년도 계산
         const yy = parseInt(numbers.substring(0, 2), 10);
@@ -493,14 +497,14 @@
 
         // 연도 계산 (세기 구분)
         let fullYear;
-        if (genderCode === '1' || genderCode === '2' || genderCode === '5' || genderCode === '6') {
+        if (['1', '2', '5', '6'].includes(genderCode)) {
             fullYear = 1900 + yy;
-        } else if (genderCode === '3' || genderCode === '4' || genderCode === '7' || genderCode === '8') {
+        } else if (['3', '4', '7', '8'].includes(genderCode)) {
             fullYear = 2000 + yy;
         } else {
             messageSpan.textContent = '올바른 주민번호를 입력해주세요';
             birthDInput.value = "";
-
+            hiddenInput.value = "";
             return;
         }
 
@@ -514,15 +518,15 @@
 
         if (age < 19) {
             messageSpan.textContent = '미성년자는 신청할 수 없습니다';
+            hiddenInput.value = "";
             return;
         }
-
 
         // 날짜 유효성 체크
         const birthDate = new Date(fullYear, mm - 1, dd);
         if (birthDate.getFullYear() !== fullYear || birthDate.getMonth() + 1 !== mm || birthDate.getDate() !== dd) {
             messageSpan.textContent = '유효하지 않은 생년월일입니다';
-
+            hiddenInput.value = "";
             return;
         }
 
@@ -535,15 +539,17 @@
         const checkDigit = (11 - (sum % 11)) % 10;
         if (checkDigit !== parseInt(numbers.charAt(12), 10)) {
             messageSpan.textContent = '주민번호 검증에 실패했습니다';
+            hiddenInput.value = "";
             return;
         }
 
         // 모든 검사 통과
         messageSpan.textContent = '';
         ssnChecked = true;
-        }
+    }
 
-        // 신청 날짜는 현재 날짜로 디폴트 처리
+
+    // 신청 날짜는 현재 날짜로 디폴트 처리
         window.addEventListener("DOMContentLoaded", () => {
             const applD = document.getElementById("applD");
             if (!applD.value) {
@@ -601,7 +607,7 @@
 
     // 조회 기능
     function searchAppl() {
-        const ssn = document.getElementById("ssn").value;
+        const ssn = document.getElementById("ssnOriginal").value;
         const rcvD = document.getElementById("rcvD").value;
         const rcvSeqNo = document.getElementById("rcvSeqNo").value;
 

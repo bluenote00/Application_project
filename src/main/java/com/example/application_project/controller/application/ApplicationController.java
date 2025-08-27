@@ -180,7 +180,7 @@ public class ApplicationController {
 
                 logger.info("비밀번호 오류 → 불능 처리 : " + applicationDto);
 
-            } else if(validationMsg == null) {
+            } else if (applicationDto.getImpsbClas() == null) {
 
                 redirectAttributes.addFlashAttribute("message", "신청이 완료되었습니다.");
                 logger.info("정상 신청 : " + applicationDto);

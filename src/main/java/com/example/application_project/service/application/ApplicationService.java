@@ -106,7 +106,7 @@ public class ApplicationService {
     public String validatePassword(String scrtNo, String hdpNo, String birthD) {
         // 동일 숫자 반복 체크
         if (scrtNo.chars().distinct().count() == 1) {
-            return "동일 숫자 사용";
+            return "비밀번호 - 동일 숫자 사용";
         }
 
         // 연속된 숫자 체크
@@ -120,14 +120,14 @@ public class ApplicationService {
             if (next != cur - 1) sequentialDesc = false;
         }
         if (sequentialAsc || sequentialDesc) {
-            return "연속된 숫자 사용";
+            return "비밀번호 - 연속된 숫자 사용";
         }
 
         // 핸드폰 번호 끝 4자리 체크
         if (hdpNo != null && hdpNo.length() >= 4) {
             String last4 = hdpNo.substring(hdpNo.length() - 4);
             if (scrtNo.equals(last4)) {
-                return "핸드폰 번호 중복";
+                return "비밀번호 - 핸드폰 번호 중복";
             }
         }
 
@@ -135,7 +135,7 @@ public class ApplicationService {
         if (birthD != null && birthD.length() >= 8) {
             String birth4 = birthD.substring(4);
             if (scrtNo.equals(birth4)) {
-                return "생년월일 중복";
+                return "비밀번호 - 생년월일 중복";
             }
         }
 

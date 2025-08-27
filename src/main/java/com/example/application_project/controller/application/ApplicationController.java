@@ -110,6 +110,13 @@ public class ApplicationController {
             String impsbMsg = applicationService.getImpsbMsg(entity.getImpsbCd());
             result.put("impsbMsg", impsbMsg);
 
+            // 불능 코드가 02여서 계좌 오류일 경우, 띄울 메세지
+            if ("02".equals(entity.getImpsbCd())) {
+                result.put("stlActCheck", "존재하지 않는 계좌");
+            } else {
+                result.put("stlActCheck", "");
+            }
+
             logger.info("+ Start " + className + " 조회 결과 " + result);
         }
         return result;
@@ -123,11 +130,11 @@ public class ApplicationController {
 
         logger.info("+ Start " + className + " 입회신청서 등록 " + applicationDto);
 
-        // 오늘 날짜 + 주민번호로 중복 체크
-        int isDuplicate = applicationService.checkDupApplication(applicationDto);
+        // 1. 당일 중복 체크 : 오늘 날짜 + 주민 번호
+        int appDuplicate = applicationService.checkDupApplication(applicationDto);
 
         // 당일 중복 시 - 불능 처리
-        if (isDuplicate > 0) {
+        if (appDuplicate > 0) {
             applicationDto.setImpsbClas("불능");
             applicationDto.setImpsbCd("01");
 
@@ -136,19 +143,53 @@ public class ApplicationController {
             logger.info("중복 신청 → 불능 처리 : " + applicationDto);
 
         // 당일 중복이 아닐시 - 정상 신청
-        } else if(isDuplicate < 1) {
-            logger.info("정상 신청 : " + applicationDto);
+        } else if(appDuplicate < 1) {
 
-            redirectAttributes.addFlashAttribute("message", "신청이 완료되었습니다.");
+            // 2. 계좌 확인 : 은행 코드 + 계좌 번호
+            int acntCheck = applicationService.checkAcnt(applicationDto);
+
+            // 계좌 오류 - 매칭되는 계좌가 없는 경우
+            if (acntCheck < 1) {
+                applicationDto.setImpsbClas("불능");
+                applicationDto.setImpsbCd("02");
+
+                redirectAttributes.addFlashAttribute("message", "불능 - 계좌 오류");
+
+                logger.info("계좌 오류 → 불능 처리 : " + applicationDto);
+
+            // 계좌 정상 - 매칭되는 계좌가 있는 경우
+            } else if(acntCheck > 0) {
+
+                redirectAttributes.addFlashAttribute("message", "신청이 완료되었습니다.");
+                logger.info("정상 신청 : " + applicationDto);
+            }
+
+
+            //  3. 비밀번호 확인
+            String validationMsg = applicationService.validatePassword(
+                    applicationDto.getScrtNo(),
+                    applicationDto.getHdpNo(),
+                    applicationDto.getBirthD()
+            );
+
+            //  비밀번호 오류 - 비밀번호 유효성 검사에 통과하지 못할 경우
+            if (validationMsg != null) {
+                applicationDto.setImpsbClas("불능");
+                applicationDto.setImpsbCd("03");
+                redirectAttributes.addFlashAttribute("message", validationMsg);
+
+                logger.info("비밀번호 오류 → 불능 처리 : " + applicationDto);
+
+            } else if(validationMsg == null) {
+
+                redirectAttributes.addFlashAttribute("message", "신청이 완료되었습니다.");
+                logger.info("정상 신청 : " + applicationDto);
+            }
         }
 
+        // 최종 저장 - 불능, 가능 전부
         applicationService.insertApplication(applicationDto);
 
         return "redirect:/application/index";
     }
-
-
-
-
-
 }

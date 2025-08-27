@@ -2,6 +2,7 @@ package com.example.application_project.service.application;
 
 import com.example.application_project.dto.application.ApplicationDto;
 import com.example.application_project.entity.application.ApplicationEntity;
+import com.example.application_project.repository.acnt.AcntRepository;
 import com.example.application_project.repository.application.ApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.Optional;
 public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
+    private final AcntRepository acntRepository;
 
     // 입회신청서 조회
     public Optional<ApplicationEntity> searchAppl(String ssn, LocalDate rcvD, String rcvSeqNo) {
@@ -90,8 +92,53 @@ public class ApplicationService {
         applicationRepository.save(entity);
     }
 
-    // 중복 체크
+    // 1. 당일 중복 신청 체크
     public int checkDupApplication(ApplicationDto dto) {
         return applicationRepository.countBySsnAndRcvD(dto.getSsn(), LocalDate.now());
+    }
+
+    // 2. 계좌 정상 체크
+    public int checkAcnt(ApplicationDto dto) {
+        return acntRepository.countByAcntCodeAndAcntNum(dto.getBnkCd(), dto.getStlAct());
+    }
+
+    // 3. 비밀번호 체크
+    public String validatePassword(String scrtNo, String hdpNo, String birthD) {
+        // 동일 숫자 반복 체크
+        if (scrtNo.chars().distinct().count() == 1) {
+            return "동일 숫자 사용";
+        }
+
+        // 연속된 숫자 체크
+        boolean sequentialAsc = true;
+        boolean sequentialDesc = true;
+        for (int i = 0; i < scrtNo.length() - 1; i++) {
+            int cur = scrtNo.charAt(i) - '0';
+            int next = scrtNo.charAt(i + 1) - '0';
+
+            if (next != cur + 1) sequentialAsc = false;
+            if (next != cur - 1) sequentialDesc = false;
+        }
+        if (sequentialAsc || sequentialDesc) {
+            return "연속된 숫자 사용";
+        }
+
+        // 핸드폰 번호 끝 4자리 체크
+        if (hdpNo != null && hdpNo.length() >= 4) {
+            String last4 = hdpNo.substring(hdpNo.length() - 4);
+            if (scrtNo.equals(last4)) {
+                return "핸드폰 번호 중복";
+            }
+        }
+
+        // 생년월일 체크
+        if (birthD != null && birthD.length() >= 8) {
+            String birth4 = birthD.substring(4);
+            if (scrtNo.equals(birth4)) {
+                return "생년월일 중복";
+            }
+        }
+
+        return null;
     }
 }

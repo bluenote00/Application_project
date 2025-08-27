@@ -213,6 +213,10 @@
             border: 1px solid #ccc;
         }
 
+        #stlActCheck, #impsbClas, #impsbMsg {
+            color : #ff0000;
+        }
+
     </style>
 </head>
 <body>
@@ -350,7 +354,7 @@
             </div>
             <div>
                 <label for="결제계좌">결제계좌 확인 여부</label>
-                <input type="text" id="stlActCheck" name="stlActCheck" readonly/>
+                <input type="text" id="stlActCheck" name="stlActCheck" value="${appl.stlActCheck}" readonly/>
             </div>
             <div>
                 <label for="청구서 발송 방법">청구서 발송 방법</label>

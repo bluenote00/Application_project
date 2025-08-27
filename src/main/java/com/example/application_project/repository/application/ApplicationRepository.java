@@ -19,7 +19,7 @@ public interface ApplicationRepository extends JpaRepository<ApplicationEntity, 
     @Query("SELECT MAX(a.rcvSeqNo) FROM ApplicationEntity a WHERE a.rcvSeqNo LIKE CONCAT(:dateStr, '%')")
     String findMaxSeqNoByDate(@Param("dateStr") String dateStr);
 
-    // 당일 중복 신청 체크
+    // 1. 당일 중복 신청 체크
     int countBySsnAndRcvD(String ssn, LocalDate rcvD);
-    
+
 }

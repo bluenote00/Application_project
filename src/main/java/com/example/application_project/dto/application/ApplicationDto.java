@@ -13,7 +13,6 @@ public class ApplicationDto {
     private String status;
     private String message;
     private String stlYn;
-
     private String rcvSeqNo;
     private LocalDate rcvD;
     private String ssn;
@@ -23,6 +22,7 @@ public class ApplicationDto {
     private String engNm;
     private String stlMtd;
     private String stlAct;
+    private String stlActCheck;
     private String bnkCd;
     private String stlDd;
     private String mgtBbrn;

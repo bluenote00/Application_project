@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "BRNINF")
+@Table(name = "BRNINFO")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

@@ -408,8 +408,8 @@
                 <input type="text" id="impsbClas" name="impsbClas" value="${appl.impsbClas}" readonly/>
             </div>
             <div>
-                <label for="불능사유명">불능 사유명</label>
-                <input type="text" id="impsbCd" name="impsbCd" value="${appl.impsbCd}" readonly/>
+                <label for="불능사유명">불능 사유</label>
+                <input type="text" id="impsbMsg" name="impsbMsg" value="${appl.impsbMsg}" readonly/>
             </div>
         </div>
 
@@ -423,6 +423,13 @@
         </form>
     </div>
 
+
+    <%--  결과값  --%>
+    <c:if test="${not empty message}">
+        <script>
+            alert("${message}");
+        </script>
+    </c:if>
 
 </section>
 <script>

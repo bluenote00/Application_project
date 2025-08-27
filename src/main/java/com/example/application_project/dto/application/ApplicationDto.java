@@ -38,6 +38,7 @@ public class ApplicationDto {
     private String crdNo;
     private String impsbClas;
     private String impsbCd;
+    private String impsbMsg;
     private String lstOprTm;
     private String lstOprD;
     private String lstOprtEmpno;

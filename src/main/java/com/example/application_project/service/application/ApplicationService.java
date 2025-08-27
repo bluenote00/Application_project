@@ -21,6 +21,27 @@ public class ApplicationService {
         return applicationRepository.findBySsnAndRcvDAndRcvSeqNo(ssn, rcvD, rcvSeqNo);
     }
 
+    // 불능 코드 별 메세지 추가
+    public String getImpsbMsg(String impsbCd) {
+        if (impsbCd == null) return "";
+
+        switch (impsbCd) {
+            case "01":
+                return "01 - 당일 신청 내역 존재";
+            case "02":
+                return "02 - 결제 계좌 오류";
+            case "03":
+                return "03 - 비밀번호 오류";
+            case "04":
+                return "04 - 기존 카드 존재";
+            case "05":
+                return "05 - 기존 카드 미존재";
+            default:
+                return impsbCd;
+        }
+    }
+
+    // 입회 신청서 등록 - 신청테이블
     public void insertApplication(ApplicationDto dto) {
             // 오늘 날짜
             String todayStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -67,5 +88,10 @@ public class ApplicationService {
                 .build();
 
         applicationRepository.save(entity);
+    }
+
+    // 중복 체크
+    public int checkDupApplication(ApplicationDto dto) {
+        return applicationRepository.countBySsnAndRcvD(dto.getSsn(), LocalDate.now());
     }
 }

@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -105,6 +106,10 @@ public class ApplicationController {
             result.put("impsbClas", entity.getImpsbClas());
             result.put("impsbCd", entity.getImpsbCd());
 
+            // 불능 코드 시 메세지 추가
+            String impsbMsg = applicationService.getImpsbMsg(entity.getImpsbCd());
+            result.put("impsbMsg", impsbMsg);
+
             logger.info("+ Start " + className + " 조회 결과 " + result);
         }
         return result;
@@ -113,16 +118,36 @@ public class ApplicationController {
 
     // 입회신청서 등록
     @PostMapping("/insertAppl")
-    public String insertAppl(@ModelAttribute ApplicationDto applicationDto) {
+    public String insertAppl(@ModelAttribute ApplicationDto applicationDto,
+                             RedirectAttributes redirectAttributes) {
 
         logger.info("+ Start " + className + " 입회신청서 등록 " + applicationDto);
 
-        applicationService.insertApplication(applicationDto);
+        // 오늘 날짜 + 주민번호로 중복 체크
+        int isDuplicate = applicationService.checkDupApplication(applicationDto);
 
-        logger.info("+ End " + className + " 등록 결과 " + applicationDto);
+        // 당일 중복 시 - 불능 처리
+        if (isDuplicate > 0) {
+            applicationDto.setImpsbClas("불능");
+            applicationDto.setImpsbCd("01");
+
+            redirectAttributes.addFlashAttribute("message", "당일 중복 신청입니다.");
+
+            logger.info("중복 신청 → 불능 처리 : " + applicationDto);
+
+        // 당일 중복이 아닐시 - 정상 신청
+        } else if(isDuplicate < 1) {
+            logger.info("정상 신청 : " + applicationDto);
+
+            redirectAttributes.addFlashAttribute("message", "신청이 완료되었습니다.");
+        }
+
+        applicationService.insertApplication(applicationDto);
 
         return "redirect:/application/index";
     }
+
+
 
 
 

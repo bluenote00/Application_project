@@ -212,6 +212,8 @@ public class ApplicationController {
 
                    // 고객 테이블 insert
                    applicationService.insertCust(applicationDto);
+
+                   redirectAttributes.addFlashAttribute("message", "최초 신규 고객 신청이 완료되었습니다.");
                    logger.info("최초 신규 고객 등록 : " + applicationDto);
 
                    return "redirect:/application/index";

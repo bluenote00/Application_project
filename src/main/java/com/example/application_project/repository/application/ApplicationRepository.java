@@ -15,7 +15,7 @@ public interface ApplicationRepository extends JpaRepository<ApplicationEntity, 
     // 입회신청서 조회
     Optional<ApplicationEntity> findBySsnAndRcvDAndRcvSeqNo(String ssn, LocalDate rcvD, String rcvSeqNo);
 
-    // 입회 신청서 등록
+    // 접수 일련 번호 시퀀스
     @Query("SELECT MAX(a.rcvSeqNo) FROM ApplicationEntity a WHERE a.rcvSeqNo LIKE CONCAT(:dateStr, '%')")
     String findMaxSeqNoByDate(@Param("dateStr") String dateStr);
 

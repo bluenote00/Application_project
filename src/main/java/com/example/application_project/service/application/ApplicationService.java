@@ -4,6 +4,7 @@ import com.example.application_project.dto.application.ApplicationDto;
 import com.example.application_project.entity.application.ApplicationEntity;
 import com.example.application_project.repository.acnt.AcntRepository;
 import com.example.application_project.repository.application.ApplicationRepository;
+import com.example.application_project.repository.card.CrdRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
     private final AcntRepository acntRepository;
+    private final CrdRepository crdRepository;
 
     // 입회신청서 조회
     public Optional<ApplicationEntity> searchAppl(String ssn, LocalDate rcvD, String rcvSeqNo) {
@@ -144,6 +146,30 @@ public class ApplicationService {
 
     // 4. 최초 신규 고객 확인
     public int checkNewCust(ApplicationDto dto) {
-        return acntRepository.countBy(dto.getSsn(), dto.getBrd());
+        return crdRepository.countBySsnOrBrd(dto.getSsn(), dto.getBrd());
+    }
+
+    // 신규 고객 카드 정보 등록
+    public void insertCrd(ApplicationDto dto) {
+        ApplicationEntity entity = ApplicationEntity.builder()
+                .crdNo(dto.getRcvSeqNo())
+                .custNo(LocalDate.now())
+                .mgtBbrn(dto.getSsn())
+                .regD(LocalDate.now())
+                .ssn(LocalDate.now())
+                .vldDur(LocalDate.now())
+                .brd(LocalDate.now())
+                .scrtNo(LocalDate.now())
+                .engNm(LocalDate.now())
+                .bfCrdNo(LocalDate.now())
+                .lstCrdF(LocalDate.now())
+                .fstRegD(LocalDate.now())
+                .crdGrd(LocalDate.now())
+                .lstOprTm(LocalDate.now())
+                .lstOprD(LocalDate.now())
+                .lstOprtEmpno(LocalDate.now())
+                .build();
+
+        CrdRepository.save(entity);
     }
 }

@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CrdRepository extends JpaRepository<CardEntity, String> {
-    int countByAcntCodeAndAcntNum(String acntCode, String acntNum);
+    int countBySsnOrBrd(String ssn, String brd);
 }

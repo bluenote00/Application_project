@@ -205,6 +205,7 @@ public class ApplicationController {
                } else if (newCustYn < 1) {
 
                    applicationService.insertApplication(applicationDto);
+                   applicationService.insertCrd(applicationDto);
                    logger.info("최초 신규 고객 등록 : " + applicationDto);
 
                    return "redirect:/application/index";

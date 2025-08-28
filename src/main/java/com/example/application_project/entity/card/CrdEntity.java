@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CardEntity {
+public class CrdEntity {
 
     @Id
     @Column(name = "CRD_NO", nullable = false)

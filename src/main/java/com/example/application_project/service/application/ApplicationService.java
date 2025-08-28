@@ -2,9 +2,12 @@ package com.example.application_project.service.application;
 
 import com.example.application_project.dto.application.ApplicationDto;
 import com.example.application_project.entity.application.ApplicationEntity;
+import com.example.application_project.entity.card.CrdEntity;
+import com.example.application_project.entity.cust.CustEntity;
 import com.example.application_project.repository.acnt.AcntRepository;
 import com.example.application_project.repository.application.ApplicationRepository;
 import com.example.application_project.repository.card.CrdRepository;
+import com.example.application_project.repository.cust.CustRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +22,7 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final AcntRepository acntRepository;
     private final CrdRepository crdRepository;
+    private final CustRepository custRepository;
 
     // 입회신청서 조회
     public Optional<ApplicationEntity> searchAppl(String ssn, LocalDate rcvD, String rcvSeqNo) {
@@ -149,11 +153,11 @@ public class ApplicationService {
         return crdRepository.countBySsnOrBrd(dto.getSsn(), dto.getBrd());
     }
 
-    // 신규 고객 카드 정보 등록
+    // 최초 신규 고객 - 카드 정보 등록
     public void insertCrd(ApplicationDto dto) {
-        ApplicationEntity entity = ApplicationEntity.builder()
+        CrdEntity entity = CrdEntity.builder()
                 .crdNo(dto.getRcvSeqNo())
-                .custNo(LocalDate.now())
+                .custNo(dto.getCustNo())
                 .mgtBbrn(dto.getSsn())
                 .regD(LocalDate.now())
                 .ssn(LocalDate.now())
@@ -171,5 +175,26 @@ public class ApplicationService {
                 .build();
 
         CrdRepository.save(entity);
+    }
+
+    // 최초 신규 고객 - 고객 정보 등록
+    public void insertCust(ApplicationDto dto) {
+        CustEntity entity = CustEntity.builder()
+                .regD(LocalDate.now())
+                .ssn(LocalDate.now())
+                .vldDur(LocalDate.now())
+                .brd(LocalDate.now())
+                .scrtNo(LocalDate.now())
+                .engNm(LocalDate.now())
+                .bfCrdNo(LocalDate.now())
+                .lstCrdF(LocalDate.now())
+                .fstRegD(LocalDate.now())
+                .crdGrd(LocalDate.now())
+                .lstOprTm(LocalDate.now())
+                .lstOprD(LocalDate.now())
+                .lstOprtEmpno(LocalDate.now())
+                .build();
+
+        CustRepository.save(entity);
     }
 }

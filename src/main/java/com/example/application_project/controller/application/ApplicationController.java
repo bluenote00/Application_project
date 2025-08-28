@@ -204,16 +204,22 @@ public class ApplicationController {
                 //  4. 최초 신규 고객이 맞는 경우
                } else if (newCustYn < 1) {
 
+                   // 신청 테이블 insert
                    applicationService.insertApplication(applicationDto);
+
+                   // 카드 테이블 insert
                    applicationService.insertCrd(applicationDto);
+
+                   // 고객 테이블 insert
+                   applicationService.insertCust(applicationDto);
                    logger.info("최초 신규 고객 등록 : " + applicationDto);
 
                    return "redirect:/application/index";
                }
             }
 
-            redirectAttributes.addFlashAttribute("message", "신청이 완료되었습니다.");
             // 최종 저장
+            redirectAttributes.addFlashAttribute("message", "신청이 완료되었습니다.");
             applicationService.insertApplication(applicationDto);
         }
 

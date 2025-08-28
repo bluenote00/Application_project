@@ -141,4 +141,9 @@ public class ApplicationService {
 
         return null;
     }
+
+    // 4. 최초 신규 고객 확인
+    public int checkNewCust(ApplicationDto dto) {
+        return acntRepository.countBy(dto.getSsn(), dto.getBrd());
+    }
 }

@@ -182,31 +182,38 @@ public class ApplicationController {
                 return "redirect:/application/index";
             }
 
-            //  4. 최초 신규 고객 - 불능 코드 04 (기존 카드 존재)
+            //  최초 신규 고객인 경우
             String applClas = applicationDto.getApplClas();
 
             if (applClas == "11") {
-                String validationMsg = applicationService.validatePassword(
-                        applicationDto.getScrtNo(),
-                        applicationDto.getHdpNo(),
-                        applicationDto.getBirthD()
-                );
-                
-                applicationDto.setImpsbClas("불능");
-                applicationDto.setImpsbCd("04");
+                // 신규 고객이 맞는지 확인
+                int newCustYn = applicationService.checkNewCust(applicationDto);
 
-                redirectAttributes.addFlashAttribute("message", "");
-                applicationService.insertApplication(applicationDto);
+                //  4. 최초 신규 고객이 아닌 경우 - 불능 코드 04 (기존 카드 존재)
+               if (newCustYn > 0) {
+                   applicationDto.setImpsbClas("불능");
+                   applicationDto.setImpsbCd("04");
 
-                logger.info("최초 신규 고객 (기존 카드 존재) → 불능 처리 : " + applicationDto);
+                   redirectAttributes.addFlashAttribute("message", "불능 - 신규 고객 아님");
 
-                return "redirect:/application/index";
+                   applicationService.insertApplication(applicationDto);
+                   logger.info("최초 신규 고객 (기존 카드 존재) → 불능 처리 : " + applicationDto);
+
+                   return "redirect:/application/index";
+
+                //  4. 최초 신규 고객이 맞는 경우
+               } else if (newCustYn < 1) {
+
+                   applicationService.insertApplication(applicationDto);
+                   logger.info("최초 신규 고객 등록 : " + applicationDto);
+
+                   return "redirect:/application/index";
+               }
             }
 
             redirectAttributes.addFlashAttribute("message", "신청이 완료되었습니다.");
             // 최종 저장
             applicationService.insertApplication(applicationDto);
-
         }
 
         return "redirect:/application/index";

@@ -139,10 +139,11 @@ public class ApplicationController {
             applicationDto.setImpsbCd("01");
 
             redirectAttributes.addFlashAttribute("message", "당일 중복 신청입니다.");
+            applicationService.insertApplication(applicationDto);
 
             logger.info("중복 신청 → 불능 처리 : " + applicationDto);
-
-        // 당일 중복이 아닐시 - 정상 신청
+          
+        // 당일 중복이 아닐 경우
         } else if(appDuplicate < 1) {
 
             // 2. 계좌 확인 : 은행 코드 + 계좌 번호
@@ -154,16 +155,12 @@ public class ApplicationController {
                 applicationDto.setImpsbCd("02");
 
                 redirectAttributes.addFlashAttribute("message", "불능 - 계좌 오류");
+                applicationService.insertApplication(applicationDto);
 
                 logger.info("계좌 오류 → 불능 처리 : " + applicationDto);
 
-            // 계좌 정상 - 매칭되는 계좌가 있는 경우
-            } else if(acntCheck > 0) {
-
-                redirectAttributes.addFlashAttribute("message", "신청이 완료되었습니다.");
-                logger.info("정상 신청 : " + applicationDto);
+                return "redirect:/application/index";
             }
-
 
             //  3. 비밀번호 확인
             String validationMsg = applicationService.validatePassword(
@@ -176,19 +173,41 @@ public class ApplicationController {
             if (validationMsg != null) {
                 applicationDto.setImpsbClas("불능");
                 applicationDto.setImpsbCd("03");
+
                 redirectAttributes.addFlashAttribute("message", validationMsg);
+                applicationService.insertApplication(applicationDto);
 
                 logger.info("비밀번호 오류 → 불능 처리 : " + applicationDto);
 
-            } else if (applicationDto.getImpsbClas() == null) {
-
-                redirectAttributes.addFlashAttribute("message", "신청이 완료되었습니다.");
-                logger.info("정상 신청 : " + applicationDto);
+                return "redirect:/application/index";
             }
-        }
 
-        // 최종 저장 - 불능, 가능 전부
-        applicationService.insertApplication(applicationDto);
+            //  4. 최초 신규 고객 - 불능 코드 04 (기존 카드 존재)
+            String applClas = applicationDto.getApplClas();
+
+            if (applClas == "11") {
+                String validationMsg = applicationService.validatePassword(
+                        applicationDto.getScrtNo(),
+                        applicationDto.getHdpNo(),
+                        applicationDto.getBirthD()
+                );
+                
+                applicationDto.setImpsbClas("불능");
+                applicationDto.setImpsbCd("04");
+
+                redirectAttributes.addFlashAttribute("message", "");
+                applicationService.insertApplication(applicationDto);
+
+                logger.info("최초 신규 고객 (기존 카드 존재) → 불능 처리 : " + applicationDto);
+
+                return "redirect:/application/index";
+            }
+
+            redirectAttributes.addFlashAttribute("message", "신청이 완료되었습니다.");
+            // 최종 저장
+            applicationService.insertApplication(applicationDto);
+
+        }
 
         return "redirect:/application/index";
     }

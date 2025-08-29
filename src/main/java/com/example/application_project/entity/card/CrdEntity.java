@@ -21,8 +21,7 @@ public class CrdEntity {
     @Column(name = "CRD_NO", nullable = false)
     private String crdNo;
 
-    @Id
-    @Column(name = "CUST_NO", nullable = false)
+    @Column(name = "CUST_NO")
     private String custNo;
 
     @Column(name = "MGT_BBRN")

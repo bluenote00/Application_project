@@ -1,13 +1,11 @@
 package com.example.application_project.dto.card;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class CardDto {
+public class CrdDto {
     private String crdNo;
     private String custNo;
     private String mgtBbrn;

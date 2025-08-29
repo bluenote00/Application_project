@@ -2,6 +2,7 @@ package com.example.application_project.service.application;
 
 import com.example.application_project.dto.application.ApplicationDto;
 import com.example.application_project.entity.application.ApplicationEntity;
+import com.example.application_project.entity.bill.BillEntity;
 import com.example.application_project.entity.card.CrdEntity;
 import com.example.application_project.entity.cust.CustEntity;
 import com.example.application_project.repository.acnt.AcntRepository;
@@ -150,51 +151,88 @@ public class ApplicationService {
 
     // 4. 최초 신규 고객 확인
     public int checkNewCust(ApplicationDto dto) {
-        return crdRepository.countBySsnOrBrd(dto.getSsn(), dto.getBrd());
-    }
-
-    // 최초 신규 고객 - 카드 정보 등록
-    public void insertCrd(ApplicationDto dto) {
-        CrdEntity entity = CrdEntity.builder()
-                .crdNo(dto.getRcvSeqNo())
-                .custNo(dto.getCustNo())
-                .mgtBbrn(dto.getSsn())
-                .regD(LocalDate.now())
-                .ssn(LocalDate.now())
-                .vldDur(LocalDate.now())
-                .brd(LocalDate.now())
-                .scrtNo(LocalDate.now())
-                .engNm(LocalDate.now())
-                .bfCrdNo(LocalDate.now())
-                .lstCrdF(LocalDate.now())
-                .fstRegD(LocalDate.now())
-                .crdGrd(LocalDate.now())
-                .lstOprTm(LocalDate.now())
-                .lstOprD(LocalDate.now())
-                .lstOprtEmpno(LocalDate.now())
-                .build();
-
-        CrdRepository.save(entity);
+        return crdRepository.countBySsn(dto.getSsn());
     }
 
     // 최초 신규 고객 - 고객 정보 등록
-    public void insertCust(ApplicationDto dto) {
+    public void insertCust(ApplicationDto dto, String loginId) {
+
+        // 고객번호 조회 후 최신 번호
+        String lastCustNo = custRepository.findMaxCustNo();
+        long nextCustNo = 1L;
+
+        if (lastCustNo != null) {
+            nextCustNo = Long.parseLong(lastCustNo) + 1;
+        }
+
+        String newCustNo = String.format("%09d", nextCustNo);
+
+        // 2. 날짜/시간 값
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss"));
+
+        // 3. Entity 생성
         CustEntity entity = CustEntity.builder()
-                .regD(LocalDate.now())
-                .ssn(LocalDate.now())
-                .vldDur(LocalDate.now())
-                .brd(LocalDate.now())
-                .scrtNo(LocalDate.now())
-                .engNm(LocalDate.now())
-                .bfCrdNo(LocalDate.now())
-                .lstCrdF(LocalDate.now())
-                .fstRegD(LocalDate.now())
-                .crdGrd(LocalDate.now())
-                .lstOprTm(LocalDate.now())
-                .lstOprD(LocalDate.now())
-                .lstOprtEmpno(LocalDate.now())
+                .custNo(newCustNo)
+                .ssn(dto.getSsn())
+                .regD(todayDate)
+                .hgNM(dto.getHgNm())
+                .birthD(dto.getBirthD())
+                .hdpNO(dto.getHdpNo())
+                .lstOprD(todayDate)
+                .lstOprTm(currentTime)
+                .lstOprtEmpno(loginId)
                 .build();
 
-        CustRepository.save(entity);
+        custRepository.save(entity);
     }
+
+    // 최초 신규 고객 - 카드 정보 등록
+    // public void insertCrd(ApplicationDto dto) {
+        // vldDur (유효기간 = 등록일 + 5년)
+        // crdNo (Master(1) : 5310 / VISA(2) : 4906 / JCB(3) : 3560)
+        // lstCrdF (최종 카드 여부 = 신규니까 무조건 "1")
+        
+//        CrdEntity entity = CrdEntity.builder()
+//                .crdNo(dto.getRcvSeqNo())
+//                .custNo(dto.getCustNo())
+//                .mgtBbrn(dto.getMgtBbrn())
+//                .regD(LocalDate.now())
+//                .ssn(dto.getSsn())
+//                .vldDur(dto.getVldDur())
+//                .brd(dto.getBrd())
+//                .scrtNo(dto.getScrtNo())
+//                .engNm(dto.getEngNm())
+//                .bfCrdNo(dto.getBfCrdNo())
+//                .lstCrdF("1")
+//                .fstRegD(dto.getFstRegD())
+//                .crdGrd("11")
+//                .lstOprTm(LocalDate.now())
+//                .lstOprD(LocalDate.now())
+//                .lstOprtEmpno(dto.getLstOprtEmpno())
+//                .build();
+//
+//        CrdRepository.save(entity);
+//    }
+
+    // 최초 신규 고객 - 결제 정보 등록
+//    public void insertBill(ApplicationDto dto) {
+//        BillEntity entity = BillEntity.builder()
+//                .regD(LocalDate.now())
+//                .ssn(LocalDate.now())
+//                .vldDur(LocalDate.now())
+//                .brd(LocalDate.now())
+//                .scrtNo(LocalDate.now())
+//                .engNm(LocalDate.now())
+//                .bfCrdNo(LocalDate.now())
+//                .lstCrdF(LocalDate.now())
+//                .fstRegD(LocalDate.now())
+//                .crdGrd(LocalDate.now())
+//                .lstOprTm(LocalDate.now())
+//                .lstOprD(LocalDate.now())
+//                .lstOprtEmpno(LocalDate.now())
+//                .build();
+//
+//        CustRepository.save(entity);
+//    }
 }

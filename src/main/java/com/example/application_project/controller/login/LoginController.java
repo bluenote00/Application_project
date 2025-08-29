@@ -41,6 +41,7 @@ public class LoginController {
             session.setAttribute("loginId", result.getLoginId());
             session.setAttribute("name", result.getName());
             session.setAttribute("userRole", result.getUserRole());
+
             return "redirect:/application/index";
         } else {
             model.addAttribute("errorMessage", result.getMessage());
@@ -52,6 +53,7 @@ public class LoginController {
     @GetMapping("/member/logout")
     public String logout(HttpSession session) {
         session.invalidate();
+
         return "login";
     }
 }

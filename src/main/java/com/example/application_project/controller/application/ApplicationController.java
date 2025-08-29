@@ -3,6 +3,7 @@ package com.example.application_project.controller.application;
 import com.example.application_project.dto.application.ApplicationDto;
 import com.example.application_project.entity.application.ApplicationEntity;
 import com.example.application_project.service.application.ApplicationService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -125,10 +126,17 @@ public class ApplicationController {
 
     // 입회신청서 등록
     @PostMapping("/insertAppl")
-    public String insertAppl(@ModelAttribute ApplicationDto applicationDto,
-                             RedirectAttributes redirectAttributes) {
+    public String insertAppl(@RequestParam Map<String, Object> paramMap, @ModelAttribute ApplicationDto applicationDto,
+                             HttpSession session, RedirectAttributes redirectAttributes) {
 
         logger.info("+ Start " + className + " 입회신청서 등록 " + applicationDto);
+
+        // 작업자 사번 저장을 위한 세션 값 저장
+        paramMap.put("loginId", session.getAttribute("loginId"));
+        paramMap.put("userRole", session.getAttribute("userRole"));
+
+        String loginId = (String) session.getAttribute("loginId");
+
 
         // 1. 당일 중복 체크 : 오늘 날짜 + 주민 번호
         int appDuplicate = applicationService.checkDupApplication(applicationDto);
@@ -185,7 +193,7 @@ public class ApplicationController {
             //  최초 신규 고객인 경우
             String applClas = applicationDto.getApplClas();
 
-            if (applClas == "11") {
+            if ("11".equals(applClas)) {
                 // 신규 고객이 맞는지 확인
                 int newCustYn = applicationService.checkNewCust(applicationDto);
 
@@ -203,15 +211,17 @@ public class ApplicationController {
 
                 //  4. 최초 신규 고객이 맞는 경우
                } else if (newCustYn < 1) {
-
                    // 신청 테이블 insert
                    applicationService.insertApplication(applicationDto);
 
-                   // 카드 테이블 insert
-                   applicationService.insertCrd(applicationDto);
-
                    // 고객 테이블 insert
-                   applicationService.insertCust(applicationDto);
+                   applicationService.insertCust(applicationDto, loginId);
+
+                   // 카드 테이블 insert
+                  // applicationService.insertCrd(applicationDto);
+
+                   // 결제 테이블 insert
+                   // applicationService.insertAcnt(applicationDto);
 
                    redirectAttributes.addFlashAttribute("message", "최초 신규 고객 신청이 완료되었습니다.");
                    logger.info("최초 신규 고객 등록 : " + applicationDto);

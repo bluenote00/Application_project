@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "CUST")
 @Getter
@@ -25,7 +27,7 @@ public class CustEntity {
     private String ssn;
 
     @Column(name = "REG_D")
-    private String regD;
+    private LocalDate regD;
 
     @Column(name = "HG_NM")
     private String hgNM;

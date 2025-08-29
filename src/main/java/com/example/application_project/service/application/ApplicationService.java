@@ -53,9 +53,13 @@ public class ApplicationService {
     }
 
     // 입회 신청서 등록 - 신청테이블
-    public void insertApplication(ApplicationDto dto) {
+    public void insertApplication(ApplicationDto dto, String loginId) {
             // 오늘 날짜
             String todayStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+
+            String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
             // DB에서 오늘 날짜의 최대 시퀀스 조회
             String maxSeq = applicationRepository.findMaxSeqNoByDate(todayStr);
@@ -93,9 +97,9 @@ public class ApplicationService {
                 .crdNo(dto.getCrdNo())
                 .impsbClas(dto.getImpsbClas())
                 .impsbCd(dto.getImpsbCd())
-                .lstOprTm(dto.getLstOprTm())
-                .lstOprD(dto.getLstOprD())
-                .lstOprtEmpno(dto.getLstOprtEmpno())
+                .lstOprD(todayDate)
+                .lstOprTm(currentTime)
+                .lstOprtEmpno(loginId)
                 .build();
 
         applicationRepository.save(entity);
@@ -150,6 +154,7 @@ public class ApplicationService {
 
         return null;
     }
+    
 
     // 4. 최초 신규 고객 확인
     public int checkNewCust(ApplicationDto dto) {
@@ -176,7 +181,7 @@ public class ApplicationService {
         CustEntity entity = CustEntity.builder()
                 .custNo(newCustNo)
                 .ssn(dto.getSsn())
-                .regD(todayDate)
+                .regD(LocalDate.now())
                 .hgNM(dto.getHgNm())
                 .birthD(dto.getBirthD())
                 .hdpNO(dto.getHdpNo())
@@ -206,7 +211,7 @@ public class ApplicationService {
                 .dpsNm(dto.getHgNm())
                 .stlMtd(dto.getStlMtd())
                 .stlDd(dto.getStlDd())
-                .prcsClas("확인")
+                .prcsClas("Y")
                 .stmtSndMtd(dto.getStmtSndMtd())
                 .stmtDeniClas(stmtDeniClas)
                 .billZip(dto.getBilladrZip())
@@ -221,31 +226,79 @@ public class ApplicationService {
         billRepository.save(entity);
     }
 
+    // 카드 번호 체크 디지트
+    private int calculateLuhnCheckDigit(String numberWithoutCheckDigit) {
+        int sum = 0;
+        boolean alternate = true;
+
+        for (int i = numberWithoutCheckDigit.length() - 1; i >= 0; i--) {
+            int n = numberWithoutCheckDigit.charAt(i) - '0';
+            if (alternate) {
+                n *= 2;
+                if (n > 9) {
+                    n = (n % 10) + 1;
+                }
+            }
+            sum += n;
+            alternate = !alternate;
+        }
+        return (10 - (sum % 10)) % 10;
+    }
+
+
     // 최초 신규 고객 - 카드 정보 등록
-    public void insertCrd(ApplicationDto dto) {
-        // vldDur (유효기간 = 등록일 + 5년)
-        // crdNo (Master(1) : 5310 / VISA(2) : 4906 / JCB(3) : 3560)
-        // lstCrdF (최종 카드 여부 = 신규니까 무조건 "1")
-        
+    public void insertCrd(ApplicationDto dto, String loginId) {
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+        // 유효기간 = 오늘 + 5년 (yyMMdd)
+        String vldDur = LocalDate.now().plusYears(5).format(DateTimeFormatter.ofPattern("yyMMdd"));
+
+        // 브랜드 별 4자리 숫자 세팅
+        String prefix;
+        switch (dto.getBrd()) {
+            case "1": prefix = "5310"; break;
+            case "2": prefix = "4906"; break;
+            case "3": prefix = "3560"; break;
+            default: throw new IllegalArgumentException("잘못된 브랜드 코드: " + dto.getBrd());
+        }
+
+        // 카드 번호 시퀀스 추가
+        String lastCrdNo = crdRepository.findMaxCrdNo();
+
+        long nextSeq = 1;
+        if (lastCrdNo != null && lastCrdNo.length() == 16) {
+            String lastSeq = lastCrdNo.substring(6, 15);
+            nextSeq = Long.parseLong(lastSeq) + 1;
+        }
+        String seq9 = String.format("%09d", nextSeq);
+
+        // 4. 체크디지트 계산
+        String numberWithoutCheck = prefix + "11" + seq9;
+        int checkDigit = calculateLuhnCheckDigit(numberWithoutCheck);
+
+        String newCrdNo = numberWithoutCheck + checkDigit;
+
         CrdEntity entity = CrdEntity.builder()
-                .crdNo(dto.getRcvSeqNo())
+                .crdNo(newCrdNo)
                 .custNo(dto.getCustNo())
                 .mgtBbrn(dto.getMgtBbrn())
                 .regD(LocalDate.now())
                 .ssn(dto.getSsn())
-                .vldDur(dto.getVldDur())
+                .vldDur(vldDur)
                 .brd(dto.getBrd())
                 .scrtNo(dto.getScrtNo())
                 .engNm(dto.getEngNm())
                 .bfCrdNo(dto.getBfCrdNo())
                 .lstCrdF("1")
-                .fstRegD(dto.getFstRegD())
+                .fstRegD(LocalDate.now())
                 .crdGrd("11")
-                .lstOprTm(LocalDate.now())
-                .lstOprD(LocalDate.now())
-                .lstOprtEmpno(dto.getLstOprtEmpno())
+                .lstOprD(todayDate)
+                .lstOprTm(currentTime)
+                .lstOprtEmpno(loginId)
                 .build();
 
-        CrdRepository.save(entity);
+        crdRepository.save(entity);
     }
+
 }

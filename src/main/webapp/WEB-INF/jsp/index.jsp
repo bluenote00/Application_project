@@ -272,7 +272,7 @@
                     <option value="">선택</option>
                     <option value="11">최초신규</option>
                     <option value="12">추가신규</option>
-                    <option value="21">추가재발급</option>
+                    <option value="21">재발급</option>
                 </select>
             </div>
             <div>

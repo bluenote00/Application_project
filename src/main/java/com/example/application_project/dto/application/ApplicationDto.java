@@ -43,4 +43,9 @@ public class ApplicationDto {
     private String lstOprTm;
     private String lstOprD;
     private String lstOprtEmpno;
+
+    private String vldDur;
+    private String bfCrdNo;
+    private String fstRegD;
+
 }

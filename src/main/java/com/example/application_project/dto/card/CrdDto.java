@@ -3,13 +3,15 @@ package com.example.application_project.dto.card;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 public class CrdDto {
     private String crdNo;
     private String custNo;
     private String mgtBbrn;
-    private String regD;
+    private LocalDate regD;
     private String ssn;
     private String vldDur;
     private String brd;
@@ -17,7 +19,7 @@ public class CrdDto {
     private String engNm;
     private String bfCrdNo;
     private String lstCrdF;
-    private String fstRegD;
+    private LocalDate fstRegD;
     private String crdGrd;
     private String lstOprTm;
     private String lstOprD;

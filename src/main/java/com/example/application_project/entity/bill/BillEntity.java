@@ -30,10 +30,10 @@ public class BillEntity {
     private String dpsNm;
 
     @Column(name = "STL_MTD")
-    private String stlMTD;
+    private String stlMtd;
 
     @Column(name = "STL_DD")
-    private String StlDd;
+    private String stlDd;
 
     @Column(name = "PRCS_CLAS")
     private String prcsClas;

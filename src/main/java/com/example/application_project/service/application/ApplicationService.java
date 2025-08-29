@@ -7,6 +7,7 @@ import com.example.application_project.entity.card.CrdEntity;
 import com.example.application_project.entity.cust.CustEntity;
 import com.example.application_project.repository.acnt.AcntRepository;
 import com.example.application_project.repository.application.ApplicationRepository;
+import com.example.application_project.repository.bill.BillRepository;
 import com.example.application_project.repository.card.CrdRepository;
 import com.example.application_project.repository.cust.CustRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class ApplicationService {
     private final AcntRepository acntRepository;
     private final CrdRepository crdRepository;
     private final CustRepository custRepository;
+    private final BillRepository billRepository;
 
     // 입회신청서 조회
     public Optional<ApplicationEntity> searchAppl(String ssn, LocalDate rcvD, String rcvSeqNo) {
@@ -157,7 +159,7 @@ public class ApplicationService {
     // 최초 신규 고객 - 고객 정보 등록
     public void insertCust(ApplicationDto dto, String loginId) {
 
-        // 고객번호 조회 후 최신 번호
+        // 고객번호 조회 후 최신 번호로 시퀀스
         String lastCustNo = custRepository.findMaxCustNo();
         long nextCustNo = 1L;
 
@@ -167,11 +169,10 @@ public class ApplicationService {
 
         String newCustNo = String.format("%09d", nextCustNo);
 
-        // 2. 날짜/시간 값
-        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss"));
-
-        // 3. Entity 생성
+        // 최종 작업자 날짜와 시간 분리
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        
         CustEntity entity = CustEntity.builder()
                 .custNo(newCustNo)
                 .ssn(dto.getSsn())
@@ -185,54 +186,66 @@ public class ApplicationService {
                 .build();
 
         custRepository.save(entity);
+
+        // 아래 결제 정보/카드 정보 등록에서 사용 할 수 있도록 set함
+        dto.setCustNo(newCustNo);
+    }
+
+    // 최초 신규 고객 - 결제 정보 등록
+    public void insertBill(ApplicationDto dto, String loginId) {
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+        // 청구서 사절("4")일 경우 Y 아니면 N
+        String stmtDeniClas = "4".equals(dto.getStmtSndMtd()) ? "Y" : "N";
+
+        BillEntity entity = BillEntity.builder()
+                .custNo(dto.getCustNo())
+                .stlAct(dto.getStlAct())
+                .bnkCd(dto.getBnkCd())
+                .dpsNm(dto.getHgNm())
+                .stlMtd(dto.getStlMtd())
+                .stlDd(dto.getStlDd())
+                .prcsClas("확인")
+                .stmtSndMtd(dto.getStmtSndMtd())
+                .stmtDeniClas(stmtDeniClas)
+                .billZip(dto.getBilladrZip())
+                .billAdr1(dto.getBilladrAdr1())
+                .billAdr2(dto.getBilladrAdr2())
+                .emailAdr(dto.getEmailAdr())
+                .lstOprD(todayDate)
+                .lstOprTm(currentTime)
+                .lstOprtEmpno(loginId)
+                .build();
+
+        billRepository.save(entity);
     }
 
     // 최초 신규 고객 - 카드 정보 등록
-    // public void insertCrd(ApplicationDto dto) {
+    public void insertCrd(ApplicationDto dto) {
         // vldDur (유효기간 = 등록일 + 5년)
         // crdNo (Master(1) : 5310 / VISA(2) : 4906 / JCB(3) : 3560)
         // lstCrdF (최종 카드 여부 = 신규니까 무조건 "1")
         
-//        CrdEntity entity = CrdEntity.builder()
-//                .crdNo(dto.getRcvSeqNo())
-//                .custNo(dto.getCustNo())
-//                .mgtBbrn(dto.getMgtBbrn())
-//                .regD(LocalDate.now())
-//                .ssn(dto.getSsn())
-//                .vldDur(dto.getVldDur())
-//                .brd(dto.getBrd())
-//                .scrtNo(dto.getScrtNo())
-//                .engNm(dto.getEngNm())
-//                .bfCrdNo(dto.getBfCrdNo())
-//                .lstCrdF("1")
-//                .fstRegD(dto.getFstRegD())
-//                .crdGrd("11")
-//                .lstOprTm(LocalDate.now())
-//                .lstOprD(LocalDate.now())
-//                .lstOprtEmpno(dto.getLstOprtEmpno())
-//                .build();
-//
-//        CrdRepository.save(entity);
-//    }
+        CrdEntity entity = CrdEntity.builder()
+                .crdNo(dto.getRcvSeqNo())
+                .custNo(dto.getCustNo())
+                .mgtBbrn(dto.getMgtBbrn())
+                .regD(LocalDate.now())
+                .ssn(dto.getSsn())
+                .vldDur(dto.getVldDur())
+                .brd(dto.getBrd())
+                .scrtNo(dto.getScrtNo())
+                .engNm(dto.getEngNm())
+                .bfCrdNo(dto.getBfCrdNo())
+                .lstCrdF("1")
+                .fstRegD(dto.getFstRegD())
+                .crdGrd("11")
+                .lstOprTm(LocalDate.now())
+                .lstOprD(LocalDate.now())
+                .lstOprtEmpno(dto.getLstOprtEmpno())
+                .build();
 
-    // 최초 신규 고객 - 결제 정보 등록
-//    public void insertBill(ApplicationDto dto) {
-//        BillEntity entity = BillEntity.builder()
-//                .regD(LocalDate.now())
-//                .ssn(LocalDate.now())
-//                .vldDur(LocalDate.now())
-//                .brd(LocalDate.now())
-//                .scrtNo(LocalDate.now())
-//                .engNm(LocalDate.now())
-//                .bfCrdNo(LocalDate.now())
-//                .lstCrdF(LocalDate.now())
-//                .fstRegD(LocalDate.now())
-//                .crdGrd(LocalDate.now())
-//                .lstOprTm(LocalDate.now())
-//                .lstOprD(LocalDate.now())
-//                .lstOprtEmpno(LocalDate.now())
-//                .build();
-//
-//        CustRepository.save(entity);
-//    }
+        CrdRepository.save(entity);
+    }
 }

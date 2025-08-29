@@ -12,6 +12,7 @@ import java.time.LocalDate;
 public class ApplicationDto {
     private String status;
     private String message;
+    private String custNo;
     private String stlYn;
     private String rcvSeqNo;
     private LocalDate rcvD;

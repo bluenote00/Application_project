@@ -217,11 +217,11 @@ public class ApplicationController {
                    // 고객 테이블 insert
                    applicationService.insertCust(applicationDto, loginId);
 
-                   // 카드 테이블 insert
-                  // applicationService.insertCrd(applicationDto);
-
                    // 결제 테이블 insert
-                   // applicationService.insertAcnt(applicationDto);
+                    applicationService.insertBill(applicationDto, loginId);
+
+                   // 카드 테이블 insert
+                   // applicationService.insertCrd(applicationDto);
 
                    redirectAttributes.addFlashAttribute("message", "최초 신규 고객 신청이 완료되었습니다.");
                    logger.info("최초 신규 고객 등록 : " + applicationDto);

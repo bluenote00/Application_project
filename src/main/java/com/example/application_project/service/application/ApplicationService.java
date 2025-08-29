@@ -301,4 +301,6 @@ public class ApplicationService {
         crdRepository.save(entity);
     }
 
+    public void updateApplication(ApplicationDto dto, String loginId) {}
+
 }

@@ -66,22 +66,4 @@ public class BillEntity {
     @Column(name = "LST_OPRT_EMPNO")
     private String lstOprtEmpno;
 
-    public void updateFromDto(ApplicationDto dto, String stmtDeniClas, String todayDate, String currentTime, String loginId) {
-        this.stlAct = dto.getStlAct();
-        this.bnkCd = dto.getBnkCd();
-        this.dpsNm = dto.getHgNm();
-        this.stlMtd = dto.getStlMtd();
-        this.stlDd = dto.getStlDd();
-        this.prcsClas = "Y";
-        this.stmtSndMtd = dto.getStmtSndMtd();
-        this.stmtDeniClas = stmtDeniClas;
-        this.billZip = dto.getBilladrZip();
-        this.billAdr1 = dto.getBilladrAdr1();
-        this.billAdr2 = dto.getBilladrAdr2();
-        this.emailAdr = dto.getEmailAdr();
-        this.lstOprD = todayDate;
-        this.lstOprTm = currentTime;
-        this.lstOprtEmpno = loginId;
-    }
-
 }

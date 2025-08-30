@@ -337,43 +337,63 @@ public class ApplicationService {
 
     // 5-1. 추가 신규 고객 - 고객 테이블 update
     public void updateCust(ApplicationDto dto, String loginId) {
-        Optional<CustEntity> optCust = custRepository.findBySsn(dto.getSsn());
-        if (optCust.isPresent()) {
-            CustEntity cust = optCust.get();
+        CustEntity existing = custRepository.findBySsn(dto.getSsn())
+                .orElseThrow(() -> new IllegalStateException("고객 테이블 수정 실패 " + dto.getSsn()));
 
-            String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
-            cust.updateFromDto(dto, todayDate, currentTime, loginId);
-            custRepository.save(cust);
+        // 기존 엔티티의 값 + 변경할 값 덮어쓰기
+        CustEntity updated = CustEntity.builder()
+                .custNo(existing.getCustNo())
+                .ssn(existing.getSsn())
+                .regD(LocalDate.now())
+                .hgNM(dto.getHgNm())
+                .birthD(dto.getBirthD())
+                .hdpNO(dto.getHdpNo())
+                .lstOprD(todayDate)
+                .lstOprTm(currentTime)
+                .lstOprtEmpno(loginId)
+                .build();
 
-            // 다음 단계(Bill update, Crd insert)에서 쓰도록 custNo 세팅
-            dto.setCustNo(cust.getCustNo());
+        custRepository.save(updated);
 
-        } else {
-            throw new IllegalStateException("고객 테이블 수정 실패 " + dto.getSsn());
-        }
+        dto.setCustNo(updated.getCustNo());
     }
 
     // 5-2. 추가 신규 고객 - 결제 테이블 update
     public void updateBill(ApplicationDto dto, String loginId) {
-        Optional<BillEntity> optBill = billRepository.findByCustNo(dto.getCustNo());
-        if (optBill.isPresent()) {
-            BillEntity bill = optBill.get();
+        BillEntity existing = billRepository.findByCustNo(dto.getCustNo())
+                .orElseThrow(() -> new IllegalStateException("결제 수정 실패 " + dto.getCustNo()));
 
-            String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
-            // 청구서 사절("4")일 경우 Y, 아니면 N
-            String stmtDeniClas = "4".equals(dto.getStmtSndMtd()) ? "Y" : "N";
+        // 청구서 사절("4")일 경우 Y, 아니면 N
+        String stmtDeniClas = "4".equals(dto.getStmtSndMtd()) ? "Y" : "N";
 
-            bill.updateFromDto(dto, stmtDeniClas, todayDate, currentTime, loginId);
-            billRepository.save(bill);
+        // 기존 엔티티의 값 + 변경할 값 덮어쓰기
+        BillEntity updated = BillEntity.builder()
+                .custNo(existing.getCustNo())
+                .stlAct(dto.getStlAct())
+                .bnkCd(dto.getBnkCd())
+                .dpsNm(dto.getHgNm())
+                .stlMtd(dto.getStlMtd())
+                .stlDd(dto.getStlDd())
+                .stmtSndMtd(dto.getStmtSndMtd())
+                .stmtDeniClas(stmtDeniClas)
+                .billZip(dto.getBilladrZip())
+                .billAdr1(dto.getBilladrAdr1())
+                .billAdr2(dto.getBilladrAdr2())
+                .emailAdr(dto.getEmailAdr())
+                .lstOprTm(currentTime)
+                .lstOprD(todayDate)
+                .lstOprtEmpno(loginId)
+                .build();
 
-        } else {
-            throw new IllegalStateException("결제 수정 실패 " + dto.getCustNo());
-        }
+        billRepository.save(updated);
     }
+
 
 
 }

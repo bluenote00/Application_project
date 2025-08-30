@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "NOSEQTBL")
 @Getter
@@ -19,7 +21,7 @@ public class NoseqEntity {
 
     @Id
     @Column(name = "RCV_D", nullable =false)
-    private String rcvD;
+    private LocalDate rcvD;
 
     @Id
     @Column(name = "RCV_SEQ_NO", nullable =false)

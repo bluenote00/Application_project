@@ -46,7 +46,7 @@ public class ApplicationDto {
 
     private String vldDur;
     private String bfCrdNo;
-    private String fstRegD;
+    private LocalDate fstRegD;
 
 
 

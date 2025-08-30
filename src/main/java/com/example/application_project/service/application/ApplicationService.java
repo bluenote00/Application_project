@@ -394,6 +394,32 @@ public class ApplicationService {
         billRepository.save(updated);
     }
 
+    // 6. 재발급 고객 - 카드 테이블에 이전 카드 UPDATE하고 신규 카드 번호 INSERT
+    public void reissueCrd(ApplicationDto dto, String loginId) {
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+        // 기존 카드 번호 정보 찾기
+        CrdEntity oldCrd = crdRepository.findBySsnAndBrdAndLstCrdF(dto.getSsn(), dto.getBrd(), "1")
+                .orElseThrow(() -> new IllegalStateException("재발급 대상 카드 못찾음: " + dto.getSsn()));
+
+
+        oldCrd = oldCrd.toBuilder()
+                .lstCrdF(null)
+                .lstOprD(todayDate)
+                .lstOprTm(currentTime)
+                .lstOprtEmpno(loginId)
+                .build();
+
+        crdRepository.save(oldCrd);
+
+        // 위에 메소드 사용해서 이전 고객 번호, 카드 번호 넣고 신규 카드 번호 생성함
+        dto.setCustNo(oldCrd.getCustNo());
+        dto.setBfCrdNo(oldCrd.getCrdNo());
+        insertCrd(dto, loginId);
+    }
+
+
 
 
 }

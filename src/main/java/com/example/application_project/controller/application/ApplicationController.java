@@ -114,7 +114,7 @@ public class ApplicationController {
             if ("02".equals(entity.getImpsbCd())) {
                 result.put("stlActCheck", "존재하지 않는 계좌");
             } else {
-                result.put("stlActCheck", "");
+                result.put("stlActCheck", "정상");
             }
 
             logger.info("+ Start " + className + " 조회 결과 " + result);
@@ -249,7 +249,7 @@ public class ApplicationController {
 
                     return "redirect:/application/index";
 
-                    //  4. 최초 신규 고객이 맞는 경우
+                    //  5. 추가 신규 고객이 맞는 경우
                 } else if (newPlusCustYn < 1) {
                     // 신청 테이블 insert
                     applicationService.insertApplication(applicationDto, loginId);
@@ -280,7 +280,7 @@ public class ApplicationController {
                 int newPlusCustYn = applicationService.checkNewPlusCust(applicationDto);
 
                 //  4. 재발급 가능 고객이 아닌 경우 - 불능 코드 05 (기존 브랜드 카드 없음)
-                if (newPlusCustYn > 0) {
+                if (newPlusCustYn < 1) {
                     applicationDto.setImpsbClas("불능");
                     applicationDto.setImpsbCd("05");
 
@@ -291,8 +291,8 @@ public class ApplicationController {
 
                     return "redirect:/application/index";
 
-                    //  4. 최초 신규 고객이 맞는 경우
-                } else if (newPlusCustYn < 1) {
+                    //  6. 재발급 고객이 맞는 경우
+                } else if (newPlusCustYn > 0) {
                     // 신청 테이블 insert
                     applicationService.insertApplication(applicationDto, loginId);
 
@@ -302,8 +302,8 @@ public class ApplicationController {
                     // 결제 테이블 update
                     applicationService.updateBill(applicationDto, loginId);
 
-                    // 카드 테이블 insert
-                    applicationService.insertCrd(applicationDto, loginId);
+                    // 재발급 고객 카드 테이블 update 후 insert
+                    applicationService.reissueCrd(applicationDto, loginId);
 
                     // 신청 테이블 - 카드 번호 update
                     applicationService.updateApplication(applicationDto, loginId);

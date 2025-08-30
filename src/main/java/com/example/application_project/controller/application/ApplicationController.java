@@ -136,8 +136,10 @@ public class ApplicationController {
 
         String loginId = (String) session.getAttribute("loginId");
 
+        // 신청 구분 코드
+        String applClas = applicationDto.getApplClas();
 
-        // 1. 당일 중복 체크 : 오늘 날짜 + 주민 번호
+        // 당일 중복 체크 : 오늘 날짜 + 주민 번호
         int appDuplicate = applicationService.checkDupApplication(applicationDto);
 
         // 당일 중복 시 - 불능 처리
@@ -189,9 +191,6 @@ public class ApplicationController {
                 return "redirect:/application/index";
             }
 
-            // 신청 구분 코드
-            String applClas = applicationDto.getApplClas();
-
             // 신규 고객인 경우 (신청 구분 - "11")
             if ("11".equals(applClas)) {
                 // 신규 고객이 맞는지 확인
@@ -205,7 +204,7 @@ public class ApplicationController {
                     redirectAttributes.addFlashAttribute("message", "불능 - 신규 고객 아님");
 
                     applicationService.insertApplication(applicationDto, loginId);
-                    logger.info("최초 신규 고객 (기존 카드 존재) → 불능 처리 : " + applicationDto);
+                    logger.info("최초 신규 고객 (기존 고객) → 불능 처리 : " + applicationDto);
 
                     return "redirect:/application/index";
 
@@ -231,21 +230,62 @@ public class ApplicationController {
 
                     return "redirect:/application/index";
                 }
+                }
 
-                // 추가 신규 고객인 경우 (신청 구분 - "12")
-                if ("12".equals(applClas)) {
-                    // 추가 신규 고객이 맞는지 확인
-                    int newPlusCustYn = applicationService.checkNewPlusCust(applicationDto);
+            // 추가 신규 고객인 경우 (신청 구분 - "12")
+            if ("12".equals(applClas)) {
+                // 추가 신규 고객이 맞는지 확인
+                int newPlusCustYn = applicationService.checkNewPlusCust(applicationDto);
 
-                    //  4. 추가 신규 고객이 아닌 경우 - 불능 코드 04 (기존 브랜드 카드 존재)
-                    if (newCustYn > 0) {
+                //  4. 추가 신규 고객이 아닌 경우 - 불능 코드 04 (기존 브랜드 카드 존재)
+                if (newPlusCustYn > 0) {
+                    applicationDto.setImpsbClas("불능");
+                    applicationDto.setImpsbCd("04");
+
+                    redirectAttributes.addFlashAttribute("message", "불능 - 추가 신규 고객 아님");
+
+                    applicationService.insertApplication(applicationDto, loginId);
+                    logger.info("추가 신규 고객 (동일 브랜드 카드 존재) → 불능 처리 : " + applicationDto);
+
+                    return "redirect:/application/index";
+
+                    //  4. 최초 신규 고객이 맞는 경우
+                } else if (newPlusCustYn < 1) {
+                    // 신청 테이블 insert
+                    applicationService.insertApplication(applicationDto, loginId);
+
+                    // 고객 테이블 update
+                    applicationService.updateCust(applicationDto, loginId);
+
+                    // 결제 테이블 update
+                    applicationService.updateBill(applicationDto, loginId);
+
+                    // 카드 테이블 insert
+                    applicationService.insertCrd(applicationDto, loginId);
+
+                    // 신청 테이블 - 카드 번호 update
+                    applicationService.updateApplication(applicationDto, loginId);
+
+                    redirectAttributes.addFlashAttribute("message", "추가 신규 고객 신청이 완료되었습니다.");
+                    logger.info("추가 신규 고객 등록 : " + applicationDto);
+
+                    return "redirect:/application/index";
+                }
+
+                // 재발급 고객인 경우 (신청 구분 - "21")
+                if ("21".equals(applClas)) {
+                    // 재발급 조건의 고객이 맞는지 확인 (동일 브랜드 카드 소지) - 위에서 이미 선언함
+                    // int newPlusCustYn = applicationService.checkNewPlusCust(applicationDto);
+
+                    //  4. 재발급 가능 고객이 아닌 경우 - 불능 코드 05 (기존 브랜드 카드 없음)
+                    if (newPlusCustYn > 0) {
                         applicationDto.setImpsbClas("불능");
-                        applicationDto.setImpsbCd("04");
+                        applicationDto.setImpsbCd("05");
 
-                        redirectAttributes.addFlashAttribute("message", "불능 - 추가 신규 고객 아님");
+                        redirectAttributes.addFlashAttribute("message", "불능 - 재발급 고객 아님");
 
                         applicationService.insertApplication(applicationDto, loginId);
-                        logger.info("최초 신규 고객 (기존 카드 존재) → 불능 처리 : " + applicationDto);
+                        logger.info("재발급 고객 (동일 브랜드 카드 미존재) → 불능 처리 : " + applicationDto);
 
                         return "redirect:/application/index";
 
@@ -254,11 +294,11 @@ public class ApplicationController {
                         // 신청 테이블 insert
                         applicationService.insertApplication(applicationDto, loginId);
 
-                        // 고객 테이블 insert
-                        applicationService.insertCust(applicationDto, loginId);
+                        // 고객 테이블 update
+                        applicationService.updateCust(applicationDto, loginId);
 
-                        // 결제 테이블 insert
-                        applicationService.insertBill(applicationDto, loginId);
+                        // 결제 테이블 update
+                        applicationService.updateBill(applicationDto, loginId);
 
                         // 카드 테이블 insert
                         applicationService.insertCrd(applicationDto, loginId);
@@ -266,13 +306,11 @@ public class ApplicationController {
                         // 신청 테이블 - 카드 번호 update
                         applicationService.updateApplication(applicationDto, loginId);
 
-                        redirectAttributes.addFlashAttribute("message", "최초 신규 고객 신청이 완료되었습니다.");
-                        logger.info("최초 신규 고객 등록 : " + applicationDto);
+                        redirectAttributes.addFlashAttribute("message", "재발급 고객 신청이 완료되었습니다.");
+                        logger.info("재발급 고객 등록 : " + applicationDto);
 
                         return "redirect:/application/index";
                     }
-                }
-
                 // 최종 저장
                 redirectAttributes.addFlashAttribute("message", "신청이 완료되었습니다.");
                 applicationService.insertApplication(applicationDto, loginId);

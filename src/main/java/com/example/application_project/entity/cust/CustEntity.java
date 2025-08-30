@@ -1,5 +1,6 @@
 package com.example.application_project.entity.cust;
 
+import com.example.application_project.dto.application.ApplicationDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -46,4 +47,14 @@ public class CustEntity {
 
     @Column(name = "LST_OPRT_EMPNO")
     private String lstOprtEmpno;
+
+    public void updateFromDto(ApplicationDto dto, String todayDate, String currentTime, String loginId) {
+        this.hgNM = dto.getHgNm();
+        this.birthD = dto.getBirthD();
+        this.hdpNO = dto.getHdpNo();
+        this.lstOprD = todayDate;
+        this.lstOprTm = currentTime;
+        this.lstOprtEmpno = loginId;
+    }
+
 }

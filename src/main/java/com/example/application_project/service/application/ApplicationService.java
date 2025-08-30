@@ -335,4 +335,45 @@ public class ApplicationService {
         return crdRepository.countBySsnAndBrd(dto.getSsn(), dto.getBrd());
     }
 
+    // 5-1. 추가 신규 고객 - 고객 테이블 update
+    public void updateCust(ApplicationDto dto, String loginId) {
+        Optional<CustEntity> optCust = custRepository.findBySsn(dto.getSsn());
+        if (optCust.isPresent()) {
+            CustEntity cust = optCust.get();
+
+            String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+            cust.updateFromDto(dto, todayDate, currentTime, loginId);
+            custRepository.save(cust);
+
+            // 다음 단계(Bill update, Crd insert)에서 쓰도록 custNo 세팅
+            dto.setCustNo(cust.getCustNo());
+
+        } else {
+            throw new IllegalStateException("고객 테이블 수정 실패 " + dto.getSsn());
+        }
+    }
+
+    // 5-2. 추가 신규 고객 - 결제 테이블 update
+    public void updateBill(ApplicationDto dto, String loginId) {
+        Optional<BillEntity> optBill = billRepository.findByCustNo(dto.getCustNo());
+        if (optBill.isPresent()) {
+            BillEntity bill = optBill.get();
+
+            String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+            // 청구서 사절("4")일 경우 Y, 아니면 N
+            String stmtDeniClas = "4".equals(dto.getStmtSndMtd()) ? "Y" : "N";
+
+            bill.updateFromDto(dto, stmtDeniClas, todayDate, currentTime, loginId);
+            billRepository.save(bill);
+
+        } else {
+            throw new IllegalStateException("결제 수정 실패 " + dto.getCustNo());
+        }
+    }
+
+
 }

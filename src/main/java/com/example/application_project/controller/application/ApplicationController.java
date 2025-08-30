@@ -149,9 +149,9 @@ public class ApplicationController {
             applicationService.insertApplication(applicationDto, loginId);
 
             logger.info("중복 신청 → 불능 처리 : " + applicationDto);
-          
-        // 당일 중복이 아닐 경우
-        } else if(appDuplicate < 1) {
+
+            // 당일 중복이 아닐 경우
+        } else if (appDuplicate < 1) {
 
             // 2. 계좌 확인 : 은행 코드 + 계좌 번호
             int acntCheck = applicationService.checkAcnt(applicationDto);
@@ -198,46 +198,88 @@ public class ApplicationController {
                 int newCustYn = applicationService.checkNewCust(applicationDto);
 
                 //  4. 최초 신규 고객이 아닌 경우 - 불능 코드 04 (기존 카드 존재)
-               if (newCustYn > 0) {
-                   applicationDto.setImpsbClas("불능");
-                   applicationDto.setImpsbCd("04");
+                if (newCustYn > 0) {
+                    applicationDto.setImpsbClas("불능");
+                    applicationDto.setImpsbCd("04");
 
-                   redirectAttributes.addFlashAttribute("message", "불능 - 신규 고객 아님");
+                    redirectAttributes.addFlashAttribute("message", "불능 - 신규 고객 아님");
 
-                   applicationService.insertApplication(applicationDto, loginId);
-                   logger.info("최초 신규 고객 (기존 카드 존재) → 불능 처리 : " + applicationDto);
+                    applicationService.insertApplication(applicationDto, loginId);
+                    logger.info("최초 신규 고객 (기존 카드 존재) → 불능 처리 : " + applicationDto);
 
-                   return "redirect:/application/index";
+                    return "redirect:/application/index";
 
-                //  4. 최초 신규 고객이 맞는 경우
-               } else if (newCustYn < 1) {
-                   // 신청 테이블 insert
-                   applicationService.insertApplication(applicationDto, loginId);
+                    //  4. 최초 신규 고객이 맞는 경우
+                } else if (newCustYn < 1) {
+                    // 신청 테이블 insert
+                    applicationService.insertApplication(applicationDto, loginId);
 
-                   // 고객 테이블 insert
-                   applicationService.insertCust(applicationDto, loginId);
+                    // 고객 테이블 insert
+                    applicationService.insertCust(applicationDto, loginId);
 
-                   // 결제 테이블 insert
+                    // 결제 테이블 insert
                     applicationService.insertBill(applicationDto, loginId);
 
-                   // 카드 테이블 insert
-                   applicationService.insertCrd(applicationDto, loginId);
+                    // 카드 테이블 insert
+                    applicationService.insertCrd(applicationDto, loginId);
 
-                   // 신청 테이블 - 카드 번호 update
-                   applicationService.updateApplication(applicationDto, loginId);
+                    // 신청 테이블 - 카드 번호 update
+                    applicationService.updateApplication(applicationDto, loginId);
 
-                   redirectAttributes.addFlashAttribute("message", "최초 신규 고객 신청이 완료되었습니다.");
-                   logger.info("최초 신규 고객 등록 : " + applicationDto);
+                    redirectAttributes.addFlashAttribute("message", "최초 신규 고객 신청이 완료되었습니다.");
+                    logger.info("최초 신규 고객 등록 : " + applicationDto);
 
-                   return "redirect:/application/index";
-               }
+                    return "redirect:/application/index";
+                }
+
+                // 추가 신규 고객인 경우 (신청 구분 - "12")
+                if ("12".equals(applClas)) {
+                    // 추가 신규 고객이 맞는지 확인
+                    int newPlusCustYn = applicationService.checkNewPlusCust(applicationDto);
+
+                    //  4. 추가 신규 고객이 아닌 경우 - 불능 코드 04 (기존 브랜드 카드 존재)
+                    if (newCustYn > 0) {
+                        applicationDto.setImpsbClas("불능");
+                        applicationDto.setImpsbCd("04");
+
+                        redirectAttributes.addFlashAttribute("message", "불능 - 추가 신규 고객 아님");
+
+                        applicationService.insertApplication(applicationDto, loginId);
+                        logger.info("최초 신규 고객 (기존 카드 존재) → 불능 처리 : " + applicationDto);
+
+                        return "redirect:/application/index";
+
+                        //  4. 최초 신규 고객이 맞는 경우
+                    } else if (newPlusCustYn < 1) {
+                        // 신청 테이블 insert
+                        applicationService.insertApplication(applicationDto, loginId);
+
+                        // 고객 테이블 insert
+                        applicationService.insertCust(applicationDto, loginId);
+
+                        // 결제 테이블 insert
+                        applicationService.insertBill(applicationDto, loginId);
+
+                        // 카드 테이블 insert
+                        applicationService.insertCrd(applicationDto, loginId);
+
+                        // 신청 테이블 - 카드 번호 update
+                        applicationService.updateApplication(applicationDto, loginId);
+
+                        redirectAttributes.addFlashAttribute("message", "최초 신규 고객 신청이 완료되었습니다.");
+                        logger.info("최초 신규 고객 등록 : " + applicationDto);
+
+                        return "redirect:/application/index";
+                    }
+                }
+
+                // 최종 저장
+                redirectAttributes.addFlashAttribute("message", "신청이 완료되었습니다.");
+                applicationService.insertApplication(applicationDto, loginId);
             }
-
-            // 최종 저장
-            redirectAttributes.addFlashAttribute("message", "신청이 완료되었습니다.");
-            applicationService.insertApplication(applicationDto, loginId);
         }
 
-        return "redirect:/application/index";
-    }
+            return "redirect:/application/index";
+        }
+
 }

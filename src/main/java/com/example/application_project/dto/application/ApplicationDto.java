@@ -48,4 +48,6 @@ public class ApplicationDto {
     private String bfCrdNo;
     private String fstRegD;
 
+
+
 }

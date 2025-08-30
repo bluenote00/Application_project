@@ -102,4 +102,11 @@ public class ApplicationEntity {
 
     @Column(name = "LST_OPRT_EMPNO")
     private String lstOprtEmpno;
+
+    public void updateCrdNo(String crdNo, String lstOprD, String lstOprTm, String lstOprtEmpno) {
+        this.crdNo = crdNo;
+        this.lstOprD = lstOprD;
+        this.lstOprTm = lstOprTm;
+        this.lstOprtEmpno = lstOprtEmpno;
+    }
 }

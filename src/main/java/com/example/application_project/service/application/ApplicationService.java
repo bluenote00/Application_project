@@ -1,5 +1,6 @@
 package com.example.application_project.service.application;
 
+import com.example.application_project.config.PasswordUtil;
 import com.example.application_project.dto.application.ApplicationDto;
 import com.example.application_project.entity.application.ApplicationEntity;
 import com.example.application_project.entity.bill.BillEntity;
@@ -11,6 +12,7 @@ import com.example.application_project.repository.bill.BillRepository;
 import com.example.application_project.repository.card.CrdRepository;
 import com.example.application_project.repository.cust.CustRepository;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -54,25 +56,27 @@ public class ApplicationService {
 
     // 입회 신청서 등록 - 신청테이블
     public void insertApplication(ApplicationDto dto, String loginId) {
-            // 오늘 날짜
-            String todayStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        // 오늘 날짜
+        String todayStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
 
-            String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        // DB에서 오늘 날짜의 최대 시퀀스 조회
+        String maxSeq = applicationRepository.findMaxSeqNoByDate(todayStr);
 
-            // DB에서 오늘 날짜의 최대 시퀀스 조회
-            String maxSeq = applicationRepository.findMaxSeqNoByDate(todayStr);
+        int nextSeq = 1;
+        if (maxSeq != null) {
+            String seqPart = maxSeq.substring(8);
+            nextSeq = Integer.parseInt(seqPart) + 1;
+        }
 
-            int nextSeq = 1;
-            if (maxSeq != null) {
-                String seqPart = maxSeq.substring(8);
-                nextSeq = Integer.parseInt(seqPart) + 1;
-            }
+        String newRcvSeqNo = todayStr + nextSeq;
 
-            String newRcvSeqNo = todayStr + nextSeq;
+        // 비밀번호 암호화
+        String encryptedScrtNo = PasswordUtil.encryptSHA256(dto.getScrtNo());
 
-            ApplicationEntity entity = ApplicationEntity.builder()
+        ApplicationEntity entity = ApplicationEntity.builder()
                 .rcvSeqNo(newRcvSeqNo)
                 .rcvD(LocalDate.now())
                 .ssn(dto.getSsn())
@@ -92,7 +96,7 @@ public class ApplicationService {
                 .billadrZip(dto.getBilladrZip())
                 .hdpNo(dto.getHdpNo())
                 .brd(dto.getBrd())
-                .scrtNo(dto.getScrtNo())
+                .scrtNo(encryptedScrtNo)
                 .emailAdr(dto.getEmailAdr())
                 .crdNo(dto.getCrdNo())
                 .impsbClas(dto.getImpsbClas())
@@ -102,8 +106,13 @@ public class ApplicationService {
                 .lstOprtEmpno(loginId)
                 .build();
 
+
         applicationRepository.save(entity);
+
+        // 다른곳에서도 암호화한 비밀번호 값이 insert되도록 set함
+        dto.setScrtNo(encryptedScrtNo);
     }
+
 
     // 1. 당일 중복 신청 체크
     public int checkDupApplication(ApplicationDto dto) {
@@ -154,7 +163,6 @@ public class ApplicationService {
 
         return null;
     }
-    
 
     // 4. 최초 신규 고객 확인
     public int checkNewCust(ApplicationDto dto) {
@@ -299,8 +307,32 @@ public class ApplicationService {
                 .build();
 
         crdRepository.save(entity);
+
+        dto.setCrdNo(newCrdNo);
     }
 
-    public void updateApplication(ApplicationDto dto, String loginId) {}
+    // 입회 신청서에 카드 번호 업데이트
+    public void updateApplication(ApplicationDto dto, String loginId) {
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String currentTime = java.time.LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+        // SSN으로 최신 접수건 조회 (최신 = RCV_D + RCV_SEQ_NO 기준)
+        Optional<ApplicationEntity> latestApplOpt = applicationRepository
+                .findLatestBySsn(dto.getSsn());
+
+        if (latestApplOpt.isPresent()) {
+            ApplicationEntity appl = latestApplOpt.get();
+            appl.updateCrdNo(dto.getCrdNo(), todayDate, currentTime, loginId);
+            applicationRepository.save(appl);
+
+        } else {
+            throw new IllegalStateException("카드 번호 update 실패 " + dto.getSsn());
+        }
+    }
+
+    // 5. 추가 신규 고객 확인
+    public int checkNewPlusCust(ApplicationDto dto) {
+        return crdRepository.countBySsnAndBrd(dto.getSsn(), dto.getBrd());
+    }
 
 }

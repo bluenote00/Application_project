@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 public interface CrdRepository extends JpaRepository<CrdEntity, String> {
     int countBySsn(String ssn);
 
+    int countBySsnAndBrd(String ssn, String brd);
+
     @Query("SELECT MAX(c.crdNo) FROM CrdEntity c")
     String findMaxCrdNo();
 

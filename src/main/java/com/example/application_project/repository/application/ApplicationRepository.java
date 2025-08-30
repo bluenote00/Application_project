@@ -21,5 +21,9 @@ public interface ApplicationRepository extends JpaRepository<ApplicationEntity, 
 
     // 1. 당일 중복 신청 체크
     int countBySsnAndRcvD(String ssn, LocalDate rcvD);
+    
+    // 2. 같은 주민 번호 최신 접수 찾기
+    @Query("SELECT a FROM ApplicationEntity a WHERE a.ssn = :ssn ORDER BY a.rcvD DESC, a.rcvSeqNo DESC")
+    Optional<ApplicationEntity> findLatestBySsn(@Param("ssn") String ssn);
 
 }

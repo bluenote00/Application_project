@@ -18,8 +18,11 @@ import com.example.application_project.repository.seqno.SeqnoRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
@@ -59,9 +62,6 @@ public class ApplicationService {
                 return impsbCd;
         }
     }
-
-
-
 
     // 입회 신청서 등록 - 신청테이블
     public void insertApplication(ApplicationDto dto, String loginId) {
@@ -449,5 +449,24 @@ public class ApplicationService {
         seqnoRepository.save(entity);
     }
 
+    @Transactional
+    public void updateImpApplication(ApplicationDto dto, String loginId) {
+        String encryptedScrtNo = PasswordUtil.encryptSHA256(dto.getScrtNo());
 
+        String oprD = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String oprTm = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+        int updated = applicationRepository.updateImpApplication(dto, encryptedScrtNo, oprD, oprTm, loginId);
+        if (updated == 0) {
+            throw new IllegalArgumentException("수정할 신청서가 없습니다.");
+        }
+    }
+
+    @Transactional
+    public void updateNoseq(ApplicationDto dto) {
+        int updated = noseqRepository.updateNoseq(dto);
+        if (updated == 0) {
+            throw new IllegalArgumentException("수정할 접수 매핑 데이터가 없습니다.");
+        }
+    }
 }

@@ -422,7 +422,8 @@
 
             <div class="button-row">
                 <button type="submit" formaction="${pageContext.request.contextPath}/application/insertAppl">등록</button>
-                <button type="button" id="editBtn" style="display:none;">수정</button>
+                <button type="submit" id="editBtn" style="display:none;"
+                 formaction="${pageContext.request.contextPath}/application/updateAppl">수정</button>
                 <button type="button" onclick="clearForm()">초기화</button>
             </div>
         </form>

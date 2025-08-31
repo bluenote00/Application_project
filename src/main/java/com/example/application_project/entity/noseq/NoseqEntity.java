@@ -20,10 +20,9 @@ import java.time.LocalDate;
 public class NoseqEntity {
 
     @Id
-    @Column(name = "RCV_D", nullable =false)
-    private LocalDate rcvD;
-
-    @Id
     @Column(name = "RCV_SEQ_NO", nullable =false)
     private String rcvSeqNo;
+
+    @Column(name = "RCV_D", nullable =false)
+    private LocalDate rcvD;
 }

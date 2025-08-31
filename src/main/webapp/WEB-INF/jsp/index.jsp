@@ -414,6 +414,7 @@
             <div>
                 <label for="불능사유명">불능 사유</label>
                 <input type="text" id="impsbMsg" name="impsbMsg" value="${appl.impsbMsg}" readonly/>
+                <input type="hidden" id="impsbCd" name="impsbCd" value="${appl.impsbCd}" readonly/>
             </div>
         </div>
 
@@ -421,7 +422,7 @@
 
             <div class="button-row">
                 <button type="submit" formaction="${pageContext.request.contextPath}/application/insertAppl">등록</button>
-                <button type="button">수정</button>
+                <button type="button" id="editBtn" style="display:none;">수정</button>
                 <button type="button" onclick="clearForm()">초기화</button>
             </div>
         </form>
@@ -650,6 +651,13 @@
                     for (let key in data) {
                         const el = document.getElementById(key);
                         if (el) el.value = data[key];
+                    }
+
+                    // 수정 버튼 노출 조건 체크
+                    if (data.impsbCd === "02" || data.impsbCd === "03") {
+                        document.getElementById("editBtn").style.display = "inline-block";
+                    } else {
+                        document.getElementById("editBtn").style.display = "none";
                     }
                 }
             })

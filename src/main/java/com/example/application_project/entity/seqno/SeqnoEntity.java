@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SeqEntity {
+public class SeqnoEntity {
 
     @Id
     @Column(name = "CUST_NO", nullable =false)

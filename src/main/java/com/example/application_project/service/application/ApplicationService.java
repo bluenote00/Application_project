@@ -6,11 +6,15 @@ import com.example.application_project.entity.application.ApplicationEntity;
 import com.example.application_project.entity.bill.BillEntity;
 import com.example.application_project.entity.card.CrdEntity;
 import com.example.application_project.entity.cust.CustEntity;
+import com.example.application_project.entity.noseq.NoseqEntity;
+import com.example.application_project.entity.seqno.SeqnoEntity;
 import com.example.application_project.repository.acnt.AcntRepository;
 import com.example.application_project.repository.application.ApplicationRepository;
 import com.example.application_project.repository.bill.BillRepository;
 import com.example.application_project.repository.card.CrdRepository;
 import com.example.application_project.repository.cust.CustRepository;
+import com.example.application_project.repository.noseq.NoseqRepository;
+import com.example.application_project.repository.seqno.SeqnoRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -28,6 +32,8 @@ public class ApplicationService {
     private final CrdRepository crdRepository;
     private final CustRepository custRepository;
     private final BillRepository billRepository;
+    private final NoseqRepository noseqRepository;
+    private final SeqnoRepository seqnoRepository;
 
     // 입회신청서 조회
     public Optional<ApplicationEntity> searchAppl(String ssn, LocalDate rcvD, String rcvSeqNo) {
@@ -53,6 +59,9 @@ public class ApplicationService {
                 return impsbCd;
         }
     }
+
+
+
 
     // 입회 신청서 등록 - 신청테이블
     public void insertApplication(ApplicationDto dto, String loginId) {
@@ -109,10 +118,21 @@ public class ApplicationService {
 
         applicationRepository.save(entity);
 
-        // 다른곳에서도 암호화한 비밀번호 값이 insert되도록 set함
+        // 다른곳에서도 위에서 사용한 값들을 사용할 수 있도록 set함
         dto.setScrtNo(encryptedScrtNo);
+        dto.setRcvSeqNo(newRcvSeqNo);
+        dto.setRcvD(LocalDate.now());
     }
 
+    // 접수 매핑 테이블 등록
+    public void insertNoseq(ApplicationDto dto) {
+        NoseqEntity entity = NoseqEntity.builder()
+                .rcvSeqNo(dto.getRcvSeqNo())
+                .rcvD(dto.getRcvD())
+                .build();
+
+        noseqRepository.save(entity);
+    }
 
     // 1. 당일 중복 신청 체크
     public int checkDupApplication(ApplicationDto dto) {
@@ -419,7 +439,15 @@ public class ApplicationService {
         insertCrd(dto, loginId);
     }
 
+    // 카드 매핑 테이블 등록
+    public void insertSeqNo(ApplicationDto dto) {
+        SeqnoEntity entity = SeqnoEntity.builder()
+                .custNo(dto.getCustNo())
+                .crdNo(dto.getCrdNo())
+                .build();
 
+        seqnoRepository.save(entity);
+    }
 
 
 }

@@ -150,6 +150,9 @@ public class ApplicationController {
             redirectAttributes.addFlashAttribute("message", "당일 중복 신청입니다.");
             applicationService.insertApplication(applicationDto, loginId);
 
+            // 접수 매핑 테이블 저장
+            applicationService.insertNoseq(applicationDto);
+
             logger.info("중복 신청 → 불능 처리 : " + applicationDto);
 
             // 당일 중복이 아닐 경우
@@ -165,6 +168,9 @@ public class ApplicationController {
 
                 redirectAttributes.addFlashAttribute("message", "불능 - 계좌 오류");
                 applicationService.insertApplication(applicationDto, loginId);
+
+                // 접수 매핑 테이블 저장
+                applicationService.insertNoseq(applicationDto);
 
                 logger.info("계좌 오류 → 불능 처리 : " + applicationDto);
 
@@ -186,6 +192,9 @@ public class ApplicationController {
                 redirectAttributes.addFlashAttribute("message", validationMsg);
                 applicationService.insertApplication(applicationDto, loginId);
 
+                // 접수 매핑 테이블 저장
+                applicationService.insertNoseq(applicationDto);
+
                 logger.info("비밀번호 오류 → 불능 처리 : " + applicationDto);
 
                 return "redirect:/application/index";
@@ -204,6 +213,10 @@ public class ApplicationController {
                     redirectAttributes.addFlashAttribute("message", "불능 - 신규 고객 아님");
 
                     applicationService.insertApplication(applicationDto, loginId);
+
+                    // 접수 매핑 테이블 저장
+                    applicationService.insertNoseq(applicationDto);
+
                     logger.info("최초 신규 고객 (기존 고객) → 불능 처리 : " + applicationDto);
 
                     return "redirect:/application/index";
@@ -225,6 +238,12 @@ public class ApplicationController {
                     // 신청 테이블 - 카드 번호 update
                     applicationService.updateApplication(applicationDto, loginId);
 
+                    // 접수 매핑 테이블 저장
+                    applicationService.insertNoseq(applicationDto);
+
+                    // 카드 매핑 테이블 저장
+                    applicationService.insertSeqNo(applicationDto);
+
                     redirectAttributes.addFlashAttribute("message", "최초 신규 고객 신청이 완료되었습니다.");
                     logger.info("최초 신규 고객 등록 : " + applicationDto);
 
@@ -245,6 +264,10 @@ public class ApplicationController {
                     redirectAttributes.addFlashAttribute("message", "불능 - 추가 신규 고객 아님");
 
                     applicationService.insertApplication(applicationDto, loginId);
+
+                    // 접수 매핑 테이블 저장
+                    applicationService.insertNoseq(applicationDto);
+
                     logger.info("추가 신규 고객 (동일 브랜드 카드 존재) → 불능 처리 : " + applicationDto);
 
                     return "redirect:/application/index";
@@ -265,6 +288,12 @@ public class ApplicationController {
 
                     // 신청 테이블 - 카드 번호 update
                     applicationService.updateApplication(applicationDto, loginId);
+
+                    // 접수 매핑 테이블 저장
+                    applicationService.insertNoseq(applicationDto);
+
+                    // 카드 매핑 테이블 저장
+                    applicationService.insertSeqNo(applicationDto);
 
                     redirectAttributes.addFlashAttribute("message", "추가 신규 고객 신청이 완료되었습니다.");
                     logger.info("추가 신규 고객 등록 : " + applicationDto);
@@ -287,6 +316,10 @@ public class ApplicationController {
                     redirectAttributes.addFlashAttribute("message", "불능 - 재발급 고객 아님");
 
                     applicationService.insertApplication(applicationDto, loginId);
+
+                    // 접수 매핑 테이블 저장
+                    applicationService.insertNoseq(applicationDto);
+
                     logger.info("재발급 고객 (동일 브랜드 카드 미존재) → 불능 처리 : " + applicationDto);
 
                     return "redirect:/application/index";
@@ -308,6 +341,12 @@ public class ApplicationController {
                     // 신청 테이블 - 카드 번호 update
                     applicationService.updateApplication(applicationDto, loginId);
 
+                    // 접수 매핑 테이블 저장
+                    applicationService.insertNoseq(applicationDto);
+
+                    // 카드 매핑 테이블 저장
+                    applicationService.insertSeqNo(applicationDto);
+
                     redirectAttributes.addFlashAttribute("message", "재발급 고객 신청이 완료되었습니다.");
                     logger.info("재발급 고객 등록 : " + applicationDto);
 
@@ -318,6 +357,9 @@ public class ApplicationController {
             // 최종 저장
             redirectAttributes.addFlashAttribute("message", "신청이 완료되었습니다.");
             applicationService.insertApplication(applicationDto, loginId);
+
+            // 접수 매핑 테이블 저장
+            applicationService.insertNoseq(applicationDto);
         }
         return "redirect:/application/index";
     }

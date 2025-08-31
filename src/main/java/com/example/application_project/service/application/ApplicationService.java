@@ -3,6 +3,7 @@ package com.example.application_project.service.application;
 import com.example.application_project.config.PasswordUtil;
 import com.example.application_project.dto.application.ApplicationDto;
 import com.example.application_project.dto.application.CustBillDto;
+import com.example.application_project.dto.cardDetail.CardDetailDto;
 import com.example.application_project.entity.application.ApplicationEntity;
 import com.example.application_project.entity.bill.BillEntity;
 import com.example.application_project.entity.card.CrdEntity;
@@ -76,6 +77,49 @@ public class ApplicationService {
     // 카드 내역 조회
     public Optional<CrdEntity> searchCardDetail(String ssn, String crdNo) {
         return crdRepository.findBySsnAndCrdNo(ssn, crdNo);
+    }
+
+    // 카드 리스트 상세 조회
+    public Optional<CardDetailDto> searchCardList(String ssn, String crdNo) {
+
+        Optional<CrdEntity> crdOpt = crdRepository.findByCrdNoAndSsn(crdNo, ssn);
+        if (crdOpt.isEmpty()) return Optional.empty();
+
+        CrdEntity crd = crdOpt.get();
+
+        Optional<CustEntity> custOpt = custRepository.findBySsn(ssn);
+        Optional<BillEntity> billOpt = custOpt.flatMap(c -> billRepository.findByCustNo(c.getCustNo()));
+
+        CardDetailDto dto = CardDetailDto.builder()
+                // CUST
+                .hgNm(custOpt.map(CustEntity::getHgNM).orElse(null))
+                .hdpNo(custOpt.map(CustEntity::getHdpNO).orElse(null))
+                .custNo(custOpt.map(CustEntity::getCustNo).orElse(null))
+                .regD(custOpt.map(CustEntity::getRegD).orElse(null))
+                // CRD
+                .crdNo(crd.getCrdNo())
+                .engNm(crd.getEngNm())
+                .vldDur(crd.getVldDur())
+                .brd(crd.getBrd())
+                .crdGrd(crd.getCrdGrd())
+                .bfCrdNo(crd.getBfCrdNo())
+                .lstCrdF(crd.getLstCrdF())
+                .fstRegD(crd.getFstRegD())
+                .mgtBbrn(crd.getMgtBbrn())
+                .lstOprD(crd.getLstOprD())
+                // BILL
+                .stlAct(billOpt.map(BillEntity::getStlAct).orElse(null))
+                .stlMtd(billOpt.map(BillEntity::getStlMtd).orElse(null))
+                .stlDd(billOpt.map(BillEntity::getStlDd).orElse(null))
+                .bnkCd(billOpt.map(BillEntity::getBnkCd).orElse(null))
+                .stmtSndMtd(billOpt.map(BillEntity::getStmtSndMtd).orElse(null))
+                .emailAdr(billOpt.map(BillEntity::getEmailAdr).orElse(null))
+                .billZip(billOpt.map(BillEntity::getBillZip).orElse(null))
+                .billAdr1(billOpt.map(BillEntity::getBillAdr1).orElse(null))
+                .billAdr2(billOpt.map(BillEntity::getBillAdr2).orElse(null))
+                .build();
+
+        return Optional.of(dto);
     }
 
 

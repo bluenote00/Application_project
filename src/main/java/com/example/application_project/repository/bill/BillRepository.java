@@ -13,5 +13,6 @@ public interface BillRepository extends JpaRepository<BillEntity, String> {
     // 해당되는 고객 번호 찾기
     Optional<BillEntity> findByCustNo(String custNo);
 
+
 }
 

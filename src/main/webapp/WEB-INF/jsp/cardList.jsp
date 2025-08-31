@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>기간별 입회신청 내역조회</title>
+    <title>소지 카드 내역조회</title>
     <style>
         * {
             box-sizing: border-box;
@@ -206,12 +206,6 @@
         .double-input input {
             width: 50%;
         }
-
-        input[readonly] {
-            background-color: #f5f5f5;
-            color: #666;
-            border: 1px solid #ccc;
-        }
     </style>
 </head>
 <body>
@@ -221,128 +215,76 @@
         <ul>
             <li data-tab="tab1"><a href="${pageContext.request.contextPath}/application/index">회원 입회 신청</a></li>
             <li data-tab="tab2"><a href="${pageContext.request.contextPath}/application/periodicalList">기간별 입회신청 내역조회</a></li>
-            <li class="active" data-tab="tab3"><a href="${pageContext.request.contextPath}/application/cardList">소지 카드 내역조회</a></li>
+            <li  class="active" data-tab="tab3"><a href="${pageContext.request.contextPath}/application/cardList">소지 카드 내역조회</a></li>
             <li data-tab="tab4"><a href="${pageContext.request.contextPath}/application/cardDetailList">카드 상세 내역조회</a></li>
             <li data-tab="tab5"><a href="${pageContext.request.contextPath}/application/userIndex">회원 색인 조회</a></li>
         </ul>
     </div>
 
-    <!-- 콘텐츠 -->
-    <div class="tab-content active" id="tab-periodical">
+
+    <div class="tab-content active" id="tab-card-list">
         <h1>소지 카드 내역조회</h1>
 
         <!-- 검색 조건 -->
         <div class="form-grid single-line-full">
             <div>
-                <label for="jumin">생년월일</label>
-                <input type="text" id="birth" name="birth"/>
+                <label for="ssn">주민번호</label>
+                <input type="text" id="ssn" name="ssn"/>
             </div>
             <div>
-                <label for="jumin">카드번호</label>
-                <input type="text" id="jumin" name="jumin"/>
-            </div>
-            <div>
-                <label for="접수번호">접수 일련 번호</label>
-                <input type="text" id="접수번호" name="접수번호"/>
+                <label for="crdNo">카드번호</label>
+                <input type="text" id="crdNo" name="crdNo"/>
             </div>
             <div class="button-cell">
                 <label>&nbsp;</label>
-                <button type="submit">조회</button>
+                <button type="button" onclick="searchCardList()">조회</button>
             </div>
         </div>
 
         <hr/>
 
-        <!-- 조회 결과 -->
-        <h4>조회 결과</h4>
+        <!-- 고객 정보 -->
+        <h4>고객 정보</h4>
         <div class="form-grid">
-            <div>
-                <label for="성명_한글">성명(한글)</label>
-                <input type="text" id="성명_한글" name="성명_한글" readonly/>
-            </div>
-            <div>
-                <label for="핸드폰">핸드폰 번호</label>
-                <input type="tel" id="핸드폰" name="핸드폰" readonly/>
-            </div>
-            <div>
-                <label for="등록일자">등록일자</label>
-                <input type="text" id="등록일자" name="등록일자" readonly/>
-            </div>
+            <div><label>성명(한글)</label><input id="hgNm" readonly/></div>
+            <div><label>핸드폰 번호</label><input id="hdpNo" readonly/></div>
+            <div><label>등록일자</label><input id="fstRegD" readonly/></div>
         </div>
 
-
+        <!-- 결제 정보 -->
+        <h4>결제 정보</h4>
         <div class="form-grid">
-            <div>
-                <label for="결제방법">결제방법</label>
-                <input type="text" id="결제방법" name="결제방법" readonly/>
-            </div>
-            <div>
-                <label for="결제은행">결제은행</label>
-                <input type="text" id="결제은행" name="결제은행" readonly/>
-            </div>
-            <div>
-                <label for="결제계좌">결제계좌</label>
-                <input type="text" id="결제계좌" name="결제계좌" readonly/>
-            </div>
+            <div><label>결제방법</label><input id="stlMtd" readonly/></div>
+            <div><label>결제은행</label><input id="bnkCd" readonly/></div>
+            <div><label>결제계좌</label><input id="stlAct" readonly/></div>
+        </div>
+        <div class="form-grid">
+            <div><label>결제일자</label><input id="stlDd" readonly/></div>
+            <div><label>청구서 발송방법</label><input id="stmtSndMtd" readonly/></div>
+            <div><label>이메일</label><input id="emailAdr" readonly/></div>
+        </div>
+        <div class="form-grid">
+            <div><label>우편번호</label><input id="billZip" readonly/></div>
+            <div><label>주소</label><input id="billAdr1" readonly/></div>
+            <div><label>상세주소</label><input id="billAdr2" readonly/></div>
         </div>
 
-        <div class="form-grid">
-            <div>
-                <label for="결제일자">결제일자</label>
-                <input type="text" id="결제일자" name="결제일자" readonly/>
-            </div>
-            <div>
-                <label for="청구서 발송방법">청구서 발송방법</label>
-                <input type="text" id="청구서 발송방법" name="청구서 발송방법" readonly/>
-            </div>
-            <div>
-                <label for="이메일">이메일</label>
-                <input type="email" id="이메일" name="이메일" readonly/>
-            </div>
-        </div>
-
-        <div class="form-grid">
-            <div>
-                <label for="우편번호">우편번호</label>
-                <input type="text" id="우편번호" name="우편번호" readonly/>
-            </div>
-            <div>
-                <label for="주소">주소</label>
-                <input type="text" id="주소" name="주소" readonly/>
-            </div>
-            <div>
-                <label for="상세주소">상세 주소</label>
-                <input type="text" id="상세주소" name="상세주소" readonly/>
-            </div>
-        </div>
-
-        <hr/>
-
-        <!-- 조회 결과 -->
-        <h4>조회 결과</h4>
+        <!-- 카드 정보 테이블 -->
+        <h4>카드 정보</h4>
         <table>
             <thead>
             <tr>
-                <th>번호</th>
-                <th>카드번호</th>
-                <th>성명(영문)</th>
-                <th>유효기간</th>
-                <th>브랜드</th>
-                <th>카드등급</th>
-                <th>발행일자</th>
-                <th>전 카드번호</th>
-                <th>최종 카드 여부</th>
-                <th>관리영업점</th>
+                <th>No</th><th>카드번호</th><th>성명(영문)</th><th>유효기간</th><th>브랜드</th><th>카드등급</th>
+                <th>발행일자</th><th>전 카드번호</th><th>최종 카드 여부</th><th>관리영업점</th>
             </tr>
             </thead>
-            <tbody>
-            <!-- 데이터 삽입 영역 -->
+            <tbody id="cardTableBody">
+            <tr><td colspan="10">조회된 데이터가 없습니다.</td></tr>
             </tbody>
         </table>
 
-        <hr/>
         <div class="button-row">
-            <button type="reset">초기화</button>
+            <button type="button" onclick="clearForm()">초기화</button>
         </div>
     </div>
 </section>
@@ -358,6 +300,98 @@
             a.parentElement.classList.remove("active");
         }
     });
+
+    const contextPath = "${pageContext.request.contextPath}";
+
+    function clearForm() {
+        document.querySelectorAll("input").forEach(el => el.value = "");
+        document.getElementById("cardTableBody").innerHTML = '<tr><td colspan="10">조회된 데이터가 없습니다.</td></tr>';
+    }
+
+    // 카드 리스트 조회
+    function searchCardList() {
+        const ssn = document.getElementById("ssn").value.trim();
+        const crdNo = document.getElementById("crdNo").value.trim();
+
+        if (!ssn) { alert("주민번호를 입력해주세요."); return; }
+        if (!crdNo) { alert("카드번호를 입력해주세요."); return; }
+
+        fetch(`${contextPath}/application/searchCardList`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ssn, crdNo })
+        })
+            .then(res => res.json())
+            .then(result => {
+                if (result.message) {
+                    alert(result.message);
+                    clearForm();
+                    return;
+                }
+
+                const data = (result.data && result.data[0]) || null;
+                if (!data) {
+                    clearForm();
+                    return;
+                }
+
+                console.log("조회 데이터:", data);
+
+                // 고객 정보 (INPUT)
+                document.getElementById("hgNm").value = data.hgNm || '';
+                document.getElementById("hdpNo").value = data.hdpNo || '';
+                document.getElementById("fstRegD").value = data.regD || '';
+
+                // 결제 정보 (BILL)
+                document.getElementById("stlMtd").value = data.stlMtd || '';
+                document.getElementById("bnkCd").value = data.bnkCd || '';
+                document.getElementById("stlAct").value = data.stlAct || '';
+                document.getElementById("stlDd").value = data.stlDd || '';
+                document.getElementById("stmtSndMtd").value = data.stmtSndMtd || '';
+                document.getElementById("emailAdr").value = data.emailAdr || '';
+                document.getElementById("billZip").value = data.billZip || '';
+                document.getElementById("billAdr1").value = data.billAdr1 || '';
+                document.getElementById("billAdr2").value = data.billAdr2 || '';
+
+                // 테이블 렌더링
+                renderTable([data]);
+            })
+            .catch(err => {
+                console.error("조회 오류:", err);
+                alert("조회 중 오류가 발생했습니다.");
+            });
+    }
+
+    // 테이블 렌더링
+    function renderTable(list) {
+        const tbody = document.getElementById("cardTableBody");
+        tbody.innerHTML = "";
+
+        list.forEach((row, idx) => {
+            const tr = document.createElement("tr");
+
+            const fields = [
+                idx + 1,
+                row.crdNo ?? '',
+                row.engNm ?? '',
+                row.vldDur ?? '',
+                row.brd ?? '',
+                row.crdGrd ?? '',
+                row.fstRegD ?? '',
+                row.bfCrdNo ?? '',
+                row.lstCrdF === true || row.lstCrdF === '1' ? 'Y' : 'N',
+                row.mgtBbrn ?? ''
+            ];
+
+            fields.forEach(value => {
+                const td = document.createElement("td");
+                td.textContent = value;
+                tr.appendChild(td);
+            });
+
+            tbody.appendChild(tr);
+        });
+    }
 </script>
 </body>
 </html>

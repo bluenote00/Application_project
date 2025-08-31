@@ -3,6 +3,7 @@ package com.example.application_project.controller.application;
 import com.example.application_project.dto.application.ApplicationDto;
 import com.example.application_project.dto.application.CustBillDto;
 import com.example.application_project.dto.card.CrdDto;
+import com.example.application_project.dto.cardDetail.CardDetailDto;
 import com.example.application_project.entity.application.ApplicationEntity;
 import com.example.application_project.entity.card.CrdEntity;
 import com.example.application_project.service.application.ApplicationService;
@@ -714,6 +715,27 @@ public class ApplicationController {
         return result;
     }
 
+    // 카드 리스트 상세 조회
+    @PostMapping("/searchCardList")
+    @ResponseBody
+    public Map<String,Object> searchCardList(@RequestBody Map<String,String> params){
+        logger.info("카드 리스트 상세 조회 : Start + " + params);
+
+        String ssn = params.get("ssn");
+        String crdNo = params.get("crdNo");
+
+        Map<String,Object> result = new HashMap<>();
+        Optional<CardDetailDto> dataOpt = applicationService.searchCardList(ssn,crdNo);
+
+        if(dataOpt.isPresent()){
+            result.put("data", Collections.singletonList(dataOpt.get()));
+            logger.info("카드 리스트 상세 조회 : " + result);
+
+        } else {
+            result.put("message", "조회 결과가 없습니다.");
+        }
+        return result;
+    }
 
 
 }

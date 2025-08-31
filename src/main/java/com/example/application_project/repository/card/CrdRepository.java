@@ -20,6 +20,11 @@ public interface CrdRepository extends JpaRepository<CrdEntity, String> {
     // 이전 카드 번호 찾기
     Optional<CrdEntity> findBySsnAndBrdAndLstCrdF(String ssn, String brd, String lstCrdF);
 
+    // 카드 번호 찾기
+    Optional<CrdEntity> findBySsnAndCrdNo(String ssn, String crdNo);
+
+    // 카드 리스트 상세 조회
+    Optional<CrdEntity> findByCrdNoAndSsn(String crdNo, String ssn);
 }
 
 

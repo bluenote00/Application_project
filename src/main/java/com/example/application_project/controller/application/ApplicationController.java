@@ -1,7 +1,10 @@
 package com.example.application_project.controller.application;
 
 import com.example.application_project.dto.application.ApplicationDto;
+import com.example.application_project.dto.application.CustBillDto;
+import com.example.application_project.dto.card.CrdDto;
 import com.example.application_project.entity.application.ApplicationEntity;
+import com.example.application_project.entity.card.CrdEntity;
 import com.example.application_project.service.application.ApplicationService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/application")
@@ -617,5 +618,102 @@ public class ApplicationController {
         }
         return "redirect:/application/index";
     }
+
+    // 기간별 입회 신청 내역 조회
+    @PostMapping("/searchApplPeriod")
+    @ResponseBody
+    public Map<String, Object> searchApplPeriod(@RequestBody Map<String, String> params) {
+        logger.info("기간별 입회 신청 내역 조회 - Start : " + params);
+
+        String startRcvDStr = params.get("startRcvD");
+        String endRcvDStr   = params.get("endRcvD");
+        String applClas     = params.get("applClas");
+        String ssn          = params.get("ssn");
+
+        LocalDate startRcvD = LocalDate.parse(startRcvDStr, DateTimeFormatter.ISO_DATE);
+        LocalDate endRcvD   = LocalDate.parse(endRcvDStr, DateTimeFormatter.ISO_DATE);
+
+        List<ApplicationDto> list = applicationService.searchApplPeriod(ssn, startRcvD, endRcvD, applClas);
+
+        logger.info("기간별 입회 신청 내역 조회 결과 : " + list);
+
+        Map<String, Object> result = new HashMap<>();
+        if (list.isEmpty()) {
+            result.put("message", "조회 결과가 없습니다.");
+        } else {
+            result.put("data", list);
+        }
+        return result;
+    }
+
+    // 회원 색인 내역 조회
+    @PostMapping("/searchUser")
+    @ResponseBody
+    public Map<String, Object> searchUser(@RequestBody Map<String, String> params) {
+        logger.info("회원 색인 내역 조회 : Start + " + params);
+
+        String ssn = params.get("jumin");       // 주민번호
+        String birthD = params.get("birthD");   // 생년월일
+        String hdpNo = params.get("hdpNo");     // 핸드폰
+
+        List<CustBillDto> list = applicationService.searchUser(ssn, birthD, hdpNo);
+
+        logger.info("회원 색인 내역 조회 : " + list);
+
+        Map<String, Object> result = new HashMap<>();
+        if (list.isEmpty()) {
+            result.put("message", "조회 결과가 없습니다.");
+        } else {
+            result.put("data", list);
+        }
+        return result;
+    }
+
+    // 카드 상세 내역 조회
+    @PostMapping("/searchCardDetail")
+    @ResponseBody
+    public Map<String, Object> searchCardDetail(@RequestBody Map<String, String> params) {
+        logger.info("카드 상세 내역 조회 : Start + " + params);
+
+        String ssn = params.get("ssn");   // 주민번호
+        String crdNo = params.get("crdNo");   // 카드번호
+
+        Optional<CrdEntity> optionalCrd = applicationService.searchCardDetail(ssn, crdNo);
+
+        Map<String, Object> result = new HashMap<>();
+        if (optionalCrd.isPresent()) {
+            CrdEntity crd = optionalCrd.get();
+
+            // 화면용 DTO로 변환 (필요시)
+            CrdDto dto = CrdDto.builder()
+                    .crdNo(crd.getCrdNo())
+                    .custNo(crd.getCustNo())
+                    .mgtBbrn(crd.getMgtBbrn())
+                    .regD(crd.getRegD())
+                    .ssn(crd.getSsn())
+                    .vldDur(crd.getVldDur())
+                    .brd(crd.getBrd())
+                    .scrtNo(crd.getScrtNo())
+                    .engNm(crd.getEngNm())
+                    .bfCrdNo(crd.getBfCrdNo())
+                    .lstCrdF(crd.getLstCrdF())
+                    .fstRegD(crd.getFstRegD())
+                    .crdGrd(crd.getCrdGrd())
+                    .lstOprTm(crd.getLstOprTm())
+                    .lstOprD(crd.getLstOprD())
+                    .lstOprtEmpno(crd.getLstOprtEmpno())
+                    .build();
+
+            result.put("data", Collections.singletonList(dto));
+
+            logger.info("카드 상세 내역 조회 : + " + result);
+        } else {
+            result.put("message", "조회 결과가 없습니다.");
+        }
+
+        return result;
+    }
+
+
 
 }

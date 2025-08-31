@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,6 +18,17 @@ public interface ApplicationRepository extends JpaRepository<ApplicationEntity, 
 
     // 입회신청서 조회
     Optional<ApplicationEntity> findBySsnAndRcvDAndRcvSeqNo(String ssn, LocalDate rcvD, String rcvSeqNo);
+
+    // 기간별 입회 신청 내역 조회
+    List<ApplicationEntity> findByRcvDBetweenAndApplClasAndSsn(
+            LocalDate startRcvD,
+            LocalDate endRcvD,
+            String applClas,
+            String ssn
+    );
+
+    // 회원 색인 내역 조회
+    List<ApplicationEntity> findBySsnAndBirthDAndHdpNo(String ssn, String birthD, String hdpNo);
 
     // 접수 일련 번호 시퀀스
     @Query("SELECT MAX(a.rcvSeqNo) FROM ApplicationEntity a WHERE a.rcvSeqNo LIKE CONCAT(:dateStr, '%')")

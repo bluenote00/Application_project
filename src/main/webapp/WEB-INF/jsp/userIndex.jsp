@@ -232,16 +232,16 @@
                 <input type="text" id="name" name="name"/>
             </div>
             <div>
-                <label for="jumin">생년월일</label>
-                <input type="text" id="jumin" name="jumin"/>
+                <label for="birthD">생년월일</label>
+                <input type="text" id="birthD" name="birthD"/>
             </div>
             <div>
                 <label for="phone">핸드폰번호</label>
-                <input type="text" id="phone" name="phone"/>
+                <input type="text" id="hdpNo" name="hdpNo"/>
             </div>
             <div class="button-cell">
                 <label>&nbsp;</label>
-                <button type="submit">조회</button>
+                <button type="button" onclick="searchUser()">조회</button>
             </div>
         </div>
 
@@ -269,11 +269,17 @@
 
         <hr/>
         <div class="button-row">
-            <button type="reset">초기화</button>
+            <button type="button" onclick="clearForm()">초기화</button>
         </div>
     </div>
-</section>
+    <%--  결과값  --%>
+    <c:if test="${not empty message}">
+        <script>
+            alert("${message}");
+        </script>
+    </c:if>
 
+</section>
 <script>
     // 현재 페이지 기준 탭 활성화
     const currentPath = window.location.pathname;
@@ -285,6 +291,77 @@
             a.parentElement.classList.remove("active");
         }
     });
+
+    // 초기화 버튼
+    function clearForm() {
+        document.querySelectorAll("form input, form select, form textarea").forEach(el => {
+            if (el.type === "checkbox" || el.type === "radio") {
+                el.checked = false;
+            } else {
+                el.value = "";
+            }
+        });
+
+        // 테이블 초기화
+        const tbody = document.querySelector("table tbody");
+        tbody.innerHTML = "";
+    }
+
+    // 조회 기능
+    function searchUser() {
+        const name = document.getElementById("name").value;
+        const birthD  = document.getElementById("birthD").value;
+        const hdpNo       = document.getElementById("hdpNo").value;
+
+        // 유효성 체크
+        if (!name)      { alert('이름을 입력해주세요.'); return; }
+        if (!birthD)     { alert('주민 번호를 입력해주세요.'); return; }
+        if (!hdpNo)     { alert('핸드폰 번호를 입력해주세요.'); return; }
+
+        fetch("${pageContext.request.contextPath}/application/searchUser", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, birthD, hdpNo })
+        })
+            .then(response => response.json())
+            .then(result => {
+                if (result.message) {
+                    alert(result.message);
+                    return;
+                }
+                renderTable(result.data || []);
+            })
+            .catch(err => console.error("조회 오류:", err));
+    }
+
+    // 테이블 렌더링
+    function renderTable(list) {
+        const tbody = document.querySelector("table tbody");
+        tbody.innerHTML = "";
+
+        list.forEach((row, idx) => {
+            const tr = document.createElement("tr");
+
+            const fields = [
+                idx + 1,
+                row.ssn ?? '',
+                row.hgNm ?? '',
+                row.birthD ?? '',
+                row.hdpNo ?? '',
+                row.bnkCd ?? '',
+                row.stlAct ?? '',
+                row.billAdr1 ?? ''
+            ];
+
+            fields.forEach(value => {
+                const td = document.createElement("td");
+                td.textContent = value;
+                tr.appendChild(td);
+            });
+
+            tbody.appendChild(tr);
+        });
+    }
 </script>
 </body>
 </html>

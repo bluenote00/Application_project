@@ -2,6 +2,7 @@ package com.example.application_project.service.application;
 
 import com.example.application_project.config.PasswordUtil;
 import com.example.application_project.dto.application.ApplicationDto;
+import com.example.application_project.dto.application.CustBillDto;
 import com.example.application_project.entity.application.ApplicationEntity;
 import com.example.application_project.entity.bill.BillEntity;
 import com.example.application_project.entity.card.CrdEntity;
@@ -10,6 +11,7 @@ import com.example.application_project.entity.noseq.NoseqEntity;
 import com.example.application_project.entity.seqno.SeqnoEntity;
 import com.example.application_project.repository.acnt.AcntRepository;
 import com.example.application_project.repository.application.ApplicationRepository;
+import com.example.application_project.repository.application.CustBillRepository;
 import com.example.application_project.repository.bill.BillRepository;
 import com.example.application_project.repository.card.CrdRepository;
 import com.example.application_project.repository.cust.CustRepository;
@@ -21,10 +23,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -38,10 +41,43 @@ public class ApplicationService {
     private final NoseqRepository noseqRepository;
     private final SeqnoRepository seqnoRepository;
 
+    private final CustBillRepository custBillRepository;
+
     // 입회신청서 조회
     public Optional<ApplicationEntity> searchAppl(String ssn, LocalDate rcvD, String rcvSeqNo) {
         return applicationRepository.findBySsnAndRcvDAndRcvSeqNo(ssn, rcvD, rcvSeqNo);
     }
+
+    // 기간별 입회 신청 내역 조회
+    public List<ApplicationDto> searchApplPeriod(String ssn, LocalDate startRcvD, LocalDate endRcvD, String applClas) {
+        List<ApplicationEntity> entities = applicationRepository.findByRcvDBetweenAndApplClasAndSsn(startRcvD, endRcvD, applClas, ssn);
+
+        return entities.stream().map(entity -> ApplicationDto.builder()
+                .rcvD(entity.getRcvD())
+                .rcvSeqNo(entity.getRcvSeqNo())
+                .ssn(entity.getSsn())
+                .hgNm(entity.getHgNm())
+                .engNm(entity.getEngNm())
+                .applClas(entity.getApplClas())
+                .brd(entity.getBrd())
+                .hdpNo(entity.getHdpNo())
+                .impsbClas(entity.getImpsbClas())
+                .impsbCd(entity.getImpsbCd())
+                .impsbMsg(getImpsbMsg(entity.getImpsbCd()))
+                .build()
+        ).toList();
+    }
+
+    // 회원 색인 내역 조회
+    public List<CustBillDto> searchUser(String ssn, String birthD, String hdpNo) {
+        return custBillRepository.searchUser(ssn, birthD, hdpNo);
+    }
+
+    // 카드 내역 조회
+    public Optional<CrdEntity> searchCardDetail(String ssn, String crdNo) {
+        return crdRepository.findBySsnAndCrdNo(ssn, crdNo);
+    }
+
 
     // 불능 코드 별 메세지 추가
     public String getImpsbMsg(String impsbCd) {

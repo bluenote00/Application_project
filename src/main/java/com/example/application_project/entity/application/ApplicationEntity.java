@@ -109,4 +109,5 @@ public class ApplicationEntity {
         this.lstOprTm = lstOprTm;
         this.lstOprtEmpno = lstOprtEmpno;
     }
+
 }

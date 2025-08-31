@@ -232,28 +232,32 @@
         <h1>기간별 입회 신청 내역 조회</h1>
 
         <!-- 검색 조건 -->
+        <form method="post">
         <div class="form-grid single-line-full">
             <div class="double-input">
                 <label>기간</label>
                 <div>
-                    <input type="date" name="startDate"/>
-                    <input type="date" name="endDate"/>
+                    <input type="date" id="startRcvD" name="startRcvD"/>
+                    <input type="date" id="endRcvD" name="endRcvD"/>
                 </div>
             </div>
             <div>
                 <label for="신청구분">신청구분</label>
-                <select id="신청구분" name="신청구분">
-                    <option>구분1</option>
-                    <option>구분2</option>
+                <select id="applClas" name="applClas">
+                    <option value="">선택</option>
+                    <option value="11">최초신규</option>
+                    <option value="12">추가신규</option>
+                    <option value="21">재발급</option>
                 </select>
             </div>
             <div>
-                <label for="jumin">주민번호</label>
-                <input type="text" id="jumin" name="jumin"/>
+                <label for="주민번호">주민번호</label>
+                <input type="text" id="ssn"
+                       maxlength="14" />
             </div>
             <div class="button-cell">
                 <label>&nbsp;</label>
-                <button type="submit">조회</button>
+                <button type="button" onclick="searchApplPeriod()">조회</button>
             </div>
         </div>
 
@@ -284,11 +288,18 @@
 
         <hr/>
         <div class="button-row">
-            <button type="reset">초기화</button>
+            <button type="button" onclick="clearForm()">초기화</button>
         </div>
     </div>
-</section>
 
+    <%--  결과값  --%>
+    <c:if test="${not empty message}">
+        <script>
+            alert("${message}");
+        </script>
+    </c:if>
+
+</section>
 <script>
     // 현재 페이지 기준 탭 활성화
     const currentPath = window.location.pathname;
@@ -300,6 +311,83 @@
             a.parentElement.classList.remove("active");
         }
     });
+
+    // 초기화 버튼
+    function clearForm() {
+        document.querySelectorAll("form input, form select, form textarea").forEach(el => {
+            if (el.type === "checkbox" || el.type === "radio") {
+                el.checked = false;
+            } else {
+                el.value = "";
+            }
+        });
+
+        // 테이블 초기화
+        const tbody = document.querySelector("table tbody");
+        tbody.innerHTML = "";
+    }
+
+    // 조회 기능
+    function searchApplPeriod() {
+        const startRcvD = document.getElementById("startRcvD").value;
+        const endRcvD   = document.getElementById("endRcvD").value;
+        const applClas  = document.getElementById("applClas").value;
+        const ssn       = document.getElementById("ssn").value;
+
+        // 유효성 체크
+        if (!startRcvD) { alert('접수 시작일자를 입력해주세요.'); return; }
+        if (!endRcvD)   { alert('접수 종료일자를 입력해주세요.'); return; }
+        if (!applClas)  { alert('신청 구분을 선택해주세요.'); return; }
+        if (!ssn)       { alert('주민번호를 입력해주세요.'); return; }
+
+        fetch("${pageContext.request.contextPath}/application/searchApplPeriod", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ startRcvD, endRcvD, applClas, ssn })
+        })
+            .then(response => response.json())
+            .then(result => {
+                if (result.message) {
+                    alert(result.message);
+                    return;
+                }
+                renderTable(result.data || []);
+            })
+            .catch(err => console.error("조회 오류:", err));
+    }
+
+    // 테이블 렌더링
+    function renderTable(list) {
+        const tbody = document.querySelector("table tbody");
+        tbody.innerHTML = "";
+
+        list.forEach((row, idx) => {
+            const tr = document.createElement("tr");
+
+            const fields = [
+                idx + 1,
+                row.rcvD ?? '',
+                row.rcvSeqNo ?? '',
+                row.ssn ?? '',
+                row.hgNm ?? '',
+                row.engNm ?? '',
+                row.applClas ?? '',
+                row.brd ?? '',
+                row.hdpNo ?? '',
+                row.impsbClas ?? '',
+                row.impsbMsg ?? ''
+            ];
+
+            fields.forEach(value => {
+                const td = document.createElement("td");
+                td.textContent = value;
+                tr.appendChild(td);
+            });
+
+            tbody.appendChild(tr);
+        });
+    }
 </script>
+
 </body>
 </html>

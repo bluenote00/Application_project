@@ -234,20 +234,16 @@
         <!-- 검색 조건 -->
         <div class="form-grid single-line-full">
             <div>
-                <label for="jumin">생년월일</label>
-                <input type="text" id="birth" name="birth"/>
-            </div>
-            <div>
-                <label for="jumin">카드번호</label>
+                <label for="jumin">주민번호</label>
                 <input type="text" id="jumin" name="jumin"/>
             </div>
             <div>
-                <label for="접수번호">접수 일련 번호</label>
-                <input type="text" id="접수번호" name="접수번호"/>
+                <label for="crdNo">카드번호</label>
+                <input type="text" id="crdNo" name="crdNo"/>
             </div>
             <div class="button-cell">
                 <label>&nbsp;</label>
-                <button type="submit">조회</button>
+                <button type="button" onclick="searchCardDetail()">조회</button>
             </div>
         </div>
 
@@ -258,11 +254,11 @@
         <div class="form-grid">
             <div>
                 <label for="성명_한글">성명(한글)</label>
-                <input type="text" id="성명_한글" name="성명_한글" readonly/>
+                <input type="text" id="hgNm" name="hgNm" readonly/>
             </div>
             <div>
                 <label for="성명_영문">성명(영문)</label>
-                <input type="text" id="성명_영문" name="성명_영문" readonly/>
+                <input type="text" id="engNm" name="engNm" readonly/>
             </div>
         </div>
 
@@ -270,86 +266,67 @@
         <div class="form-grid">
             <div>
                 <label for="등록일자">등록일자</label>
-                <input type="text" id="등록일자" name="등록일자" readonly/>
+                <input type="text" id="fstRegD" name="fstRegD" readonly/>
             </div>
             <div>
                 <label for="유효기간">유효기간</label>
-                <input type="text" id="유효기간" name="유효기간" readonly/>
+                <input type="text" id="vldDur" name="vldDur" readonly/>
             </div>
         </div>
 
         <div class="form-grid">
             <div>
                 <label for="브랜드">브랜드</label>
-                <input type="text" id="브랜드" name="브랜드" readonly/>
+                <input type="text" id="brd" name="brd" readonly/>
             </div>
             <div>
                 <label for="카드등급">카드등급</label>
-                <input type="text" id="카드등급" name="카드등급" readonly/>
+                <input type="text" id="crdGrd" name="crdGrd" readonly/>
             </div>
         </div>
 
         <div class="form-grid">
             <div>
                 <label for="전_카드번호">전 카드번호</label>
-                <input type="text" id="전_카드번호" name="전_카드번호" readonly/>
+                <input type="text" id="bfCrdNo" name="bfCrdNo" readonly/>
             </div>
             <div>
                 <label for="고객번호">고객번호</label>
-                <input type="text" id="고객번호" name="고객번호" readonly/>
+                <input type="text" id="custNo" name="custNo" readonly/>
             </div>
         </div>
 
         <div class="form-grid">
             <div>
                 <label for="영업점">관리 영업점</label>
-                <input type="text" id="영업점" name="영업점" readonly/>
+                <input type="text" id="mgtBbrn" name="mgtBbrn" readonly/>
             </div>
             <div>
                 <label for="최종카드">최종 카드여부</label>
-                <input type="text" id="최종카드" name="최종카드" readonly/>
+                <input type="text" id="lstCrdF" name="lstCrdF" readonly/>
             </div>
         </div>
 
         <div class="form-grid">
             <div>
                 <label for="최종_등록일자">최종 등록일자</label>
-                <input type="text" id="최종_등록일자" name="최종_등록일자" readonly/>
+                <input type="text" id="lstOprD" name="lstOprD" readonly/>
             </div>
         </div>
 
         <hr/>
-
-        <table>
-            <thead>
-            <tr>
-                <th>번호</th>
-                <th>접수일자</th>
-                <th>접수일련번호</th>
-                <th>성명(한글)</th>
-                <th>성명(영문)</th>
-                <th>등록일자</th>
-                <th>유효기간</th>
-                <th>브랜드</th>
-                <th>카드등급</th>
-                <th>전 카드번호</th>
-                <th>고객번호</th>
-                <th>관리 영업점</th>
-                <th>최종 카드여부</th>
-                <th>최종 등록일자</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- 데이터 삽입 영역 -->
-            </tbody>
-        </table>
-
-        <hr/>
-
         <div class="button-row">
-            <button type="reset">초기화</button>
+            <button type="button" onclick="clearForm()">초기화</button>
         </div>
     </div>
+
+    <%--  결과값  --%>
+    <c:if test="${not empty message}">
+        <script>
+            alert("${message}");
+        </script>
+    </c:if>
+
 </section>
 
 <script>
@@ -363,6 +340,54 @@
             a.parentElement.classList.remove("active");
         }
     });
+
+    // 초기화 버튼
+    function clearForm() {
+        document.querySelectorAll("input").forEach(el => {
+            el.value = "";
+        });
+    }
+
+    // 조회 기능 (단건 처리)
+    function searchCardDetail() {
+        const ssn = document.getElementById("jumin").value;
+        const crdNo = document.getElementById("crdNo").value;
+
+        // 유효성 체크
+        if (!ssn) { alert('주민번호를 입력해주세요.'); return; }
+        if (!crdNo) { alert('카드번호를 입력해주세요.'); return; }
+
+        fetch("${pageContext.request.contextPath}/application/searchCardDetail", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ssn, crdNo })
+        })
+            .then(res => res.json())
+            .then(result => {
+                if (result.message) {
+                    alert(result.message);
+                    return;
+                }
+
+                // 단건 처리
+                const data = (result.data && result.data[0]) || null;
+                if (!data) return;
+
+                document.getElementById("hgNm").value     = data.hgNm || '';
+                document.getElementById("engNm").value    = data.engNm || '';
+                document.getElementById("fstRegD").value  = data.fstRegD || '';
+                document.getElementById("vldDur").value   = data.vldDur || '';
+                document.getElementById("brd").value      = data.brd || '';
+                document.getElementById("crdGrd").value   = data.crdGrd || '';
+                document.getElementById("bfCrdNo").value  = data.bfCrdNo || '';
+                document.getElementById("custNo").value   = data.custNo || '';
+                document.getElementById("mgtBbrn").value  = data.mgtBbrn || '';
+                document.getElementById("lstCrdF").value  = data.lstCrdF || '';
+                document.getElementById("lstOprD").value  = data.lstOprD || '';
+            })
+            .catch(err => console.error("조회 오류:", err));
+    }
+
 </script>
 </body>
 </html>
